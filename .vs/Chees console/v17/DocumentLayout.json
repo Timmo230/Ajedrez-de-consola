@@ -1,0 +1,173 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\quori\\source\\repos\\Chees console\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|C:\\Users\\quori\\source\\repos\\Chees console\\chees console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\rey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\rey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\torre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\torre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\pieza.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\pieza.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|C:\\Users\\quori\\source\\repos\\Chees console\\chees console\\peon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\peon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\formardemoveravanzadas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\formardemoveravanzadas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\dama.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\dama.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\caballo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\caballo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|c:\\users\\quori\\source\\repos\\chees console\\chees console\\alfil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{41A32FA5-FAD0-48EA-8A2F-2586EAA1335E}|Chees console\\Chees console.csproj|solutionrelative:chees console\\alfil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Alfil.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Alfil.cs",
+              "RelativeDocumentMoniker": "Chees console\\Alfil.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Alfil.cs",
+              "RelativeToolTip": "Chees console\\Alfil.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:59:32.298Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Caballo.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Caballo.cs",
+              "RelativeDocumentMoniker": "Chees console\\Caballo.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Caballo.cs",
+              "RelativeToolTip": "Chees console\\Caballo.cs",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAwwIMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:59:08.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FormarDeMoverAvanzadas.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\FormarDeMoverAvanzadas.cs",
+              "RelativeDocumentMoniker": "Chees console\\FormarDeMoverAvanzadas.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\FormarDeMoverAvanzadas.cs",
+              "RelativeToolTip": "Chees console\\FormarDeMoverAvanzadas.cs",
+              "ViewState": "AgIAAG8BAAAAAAAAAAAIwIUBAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:58:37.272Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Dama.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Dama.cs",
+              "RelativeDocumentMoniker": "Chees console\\Dama.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Dama.cs",
+              "RelativeToolTip": "Chees console\\Dama.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:58:10.592Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Rey.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Rey.cs",
+              "RelativeDocumentMoniker": "Chees console\\Rey.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Rey.cs",
+              "RelativeToolTip": "Chees console\\Rey.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAQwKYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:57:35.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Torre.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Torre.cs",
+              "RelativeDocumentMoniker": "Chees console\\Torre.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Torre.cs",
+              "RelativeToolTip": "Chees console\\Torre.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAwwEgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:57:08.552Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Pieza.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Pieza.cs",
+              "RelativeDocumentMoniker": "Chees console\\Pieza.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Pieza.cs",
+              "RelativeToolTip": "Chees console\\Pieza.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAowBEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:56:11.482Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Peon.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Peon.cs",
+              "RelativeDocumentMoniker": "Chees console\\Peon.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Peon.cs",
+              "RelativeToolTip": "Chees console\\Peon.cs",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAIwKIAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:52:45.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Program.cs",
+              "RelativeDocumentMoniker": "Chees console\\Program.cs",
+              "ToolTip": "C:\\Users\\quori\\source\\repos\\Chees console\\Chees console\\Program.cs",
+              "RelativeToolTip": "Chees console\\Program.cs",
+              "ViewState": "AgIAAN4HAAAAAAAAAAAowNMHAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-07T11:49:44.712Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
