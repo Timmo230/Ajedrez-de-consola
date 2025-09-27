@@ -1,0 +1,2 @@
+C:\Users\quori\Desktop\asdasd\Ajedrez\bin\Release\net9.0\win-x64\publish\Ajedrez.pdb
+C:\Users\quori\Desktop\asdasd\Ajedrez\bin\Release\net9.0\win-x64\publish\Ajedrez.exe
