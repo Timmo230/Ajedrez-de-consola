@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\quori\\Desktop\\Ajedrez\\Ajedrez.csproj",
+      "projectUniqueName": "C:\\Users\\quori\\Desktop\\Ajedrez-de-consola\\Ajedrez.csproj",
       "projectName": "Ajedrez",
-      "projectPath": "C:\\Users\\quori\\Desktop\\Ajedrez\\Ajedrez.csproj",
+      "projectPath": "C:\\Users\\quori\\Desktop\\Ajedrez-de-consola\\Ajedrez.csproj",
       "packagesPath": "C:\\Users\\quori\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\quori\\Desktop\\Ajedrez\\obj\\",
+      "outputPath": "C:\\Users\\quori\\Desktop\\Ajedrez-de-consola\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
