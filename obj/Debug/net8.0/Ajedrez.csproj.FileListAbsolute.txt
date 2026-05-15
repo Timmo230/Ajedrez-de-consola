@@ -1,0 +1,15 @@
+/home/matias/Escritorio/Ajedrez-de-consola/bin/Debug/net8.0/Ajedrez
+/home/matias/Escritorio/Ajedrez-de-consola/bin/Debug/net8.0/Ajedrez.deps.json
+/home/matias/Escritorio/Ajedrez-de-consola/bin/Debug/net8.0/Ajedrez.runtimeconfig.json
+/home/matias/Escritorio/Ajedrez-de-consola/bin/Debug/net8.0/Ajedrez.dll
+/home/matias/Escritorio/Ajedrez-de-consola/bin/Debug/net8.0/Ajedrez.pdb
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.GeneratedMSBuildEditorConfig.editorconfig
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.AssemblyInfoInputs.cache
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.AssemblyInfo.cs
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.csproj.CoreCompileInputs.cache
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.sourcelink.json
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.dll
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/refint/Ajedrez.dll
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.pdb
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/Ajedrez.genruntimeconfig.cache
+/home/matias/Escritorio/Ajedrez-de-consola/obj/Debug/net8.0/ref/Ajedrez.dll

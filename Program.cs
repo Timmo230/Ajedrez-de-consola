@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Chees_console.Program;
 
-namespace Chees_console
-{
+namespace Chees_console {
+
     internal class Program
     {
         public enum Mov { moverPeon, moverPieza, comerConPeon, comerConPieza, enroque, moverEspecificoLetra, moverEspecificoNumero, comerEspecificoLetra, comerEspecificoNumero }
