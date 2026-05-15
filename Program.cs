@@ -1,1119 +1,684 @@
-﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static Chees_console.Program;
+using static Chess.Program;
 
-namespace Chees_console {
-
+namespace Chess
+{
     internal class Program
     {
-        public enum Mov { moverPeon, moverPieza, comerConPeon, comerConPieza, enroque, moverEspecificoLetra, moverEspecificoNumero, comerEspecificoLetra, comerEspecificoNumero }
-        public enum Piezas { peon, torre, caballo, alfil, dama, rey }
-
-        public static string[,] Tablero =
+        public enum MoveType
         {
-            {"A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"},
-            {"A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"},
-            {"A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"},
-            {"A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"},
-            {"A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"},
-            {"A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"},
-            {"A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"},
-            {"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"}
+            MovePawn, MovePiece, CaptureWithPawn, CaptureWithPiece, Castling,
+            MoveSpecificFile, MoveSpecificRank, CaptureSpecificFile, CaptureSpecificRank
+        }
+
+        public enum PieceType { Pawn, Rook, Knight, Bishop, Queen, King }
+
+        public static string[,] Board =
+        {
+            {"A8","B8","C8","D8","E8","F8","G8","H8"},
+            {"A7","B7","C7","D7","E7","F7","G7","H7"},
+            {"A6","B6","C6","D6","E6","F6","G6","H6"},
+            {"A5","B5","C5","D5","E5","F5","G5","H5"},
+            {"A4","B4","C4","D4","E4","F4","G4","H4"},
+            {"A3","B3","C3","D3","E3","F3","G3","H3"},
+            {"A2","B2","C2","D2","E2","F2","G2","H2"},
+            {"A1","B1","C1","D1","E1","F1","G1","H1"}
         };
 
-        public static string[,] TableroAlReves =
+        public static string[,] BoardFlipped =
         {
-            {"H1", "G1", "F1", "E1", "D1", "C1", "B1", "A1"},
-            {"H2", "G2", "F2", "E2", "D2", "C2", "B2", "A2"},
-            {"H3", "G3", "F3", "E3", "D3", "C3", "B3", "A3"},
-            {"H4", "G4", "F4", "E4", "D4", "C4", "B4", "A4"},
-            {"H5", "G5", "F5", "E5", "D5", "C5", "B5", "A5"},
-            {"H6", "G6", "F6", "E6", "D6", "C6", "B6", "A6"},
-            {"H7", "G7", "F7", "E7", "D7", "C7", "B7", "A7"},
-            {"H8", "G8", "F8", "E8", "D8", "C8", "B8", "A8"}
+            {"H1","G1","F1","E1","D1","C1","B1","A1"},
+            {"H2","G2","F2","E2","D2","C2","B2","A2"},
+            {"H3","G3","F3","E3","D3","C3","B3","A3"},
+            {"H4","G4","F4","E4","D4","C4","B4","A4"},
+            {"H5","G5","F5","E5","D5","C5","B5","A5"},
+            {"H6","G6","F6","E6","D6","C6","B6","A6"},
+            {"H7","G7","F7","E7","D7","C7","B7","A7"},
+            {"H8","G8","F8","E8","D8","C8","B8","A8"}
         };
 
-        public static Peon[] peonesBlancos = new Peon[10];
-        public static Peon[] peonesNegros = new Peon[10];
-        public static Torre[] torresBlancas = new Torre[10];
-        public static Torre[] torresNegras = new Torre[10];
-        public static Caballo[] caballosBlancos = new Caballo[10];
-        public static Caballo[] caballosNegros = new Caballo[10];
-        public static Alfil[] alfilesBlancos = new Alfil[10];
-        public static Alfil[] alfilesNegros = new Alfil[10];
-        public static Rey[] reyBlanco = new Rey[1];
-        public static Rey[] reyNegro = new Rey[1];
-        public static Dama[] damaBlanca = new Dama[10];
-        public static Dama[] damaNegra = new Dama[10];
+        public static Pawn[] whitePawns = new Pawn[10];
+        public static Pawn[] blackPawns = new Pawn[10];
+        public static Rook[] whiteRooks = new Rook[10];
+        public static Rook[] blackRooks = new Rook[10];
+        public static Knight[] whiteKnights = new Knight[10];
+        public static Knight[] blackKnights = new Knight[10];
+        public static Bishop[] whiteBishops = new Bishop[10];
+        public static Bishop[] blackBishops = new Bishop[10];
+        public static King[] whiteKing = new King[1];
+        public static King[] blackKing = new King[1];
+        public static Queen[] whiteQueen = new Queen[10];
+        public static Queen[] blackQueen = new Queen[10];
 
-        public static Pieza[,] piezas = new Pieza[12, 10];
-        public static Pieza[,] piezasBlancas = new Pieza[6, 10];
-        public static Pieza[,] piezasNegras = new Pieza[6, 10];
+        public static Piece[,] allPieces = new Piece[12, 10];
+        public static Piece[,] whitePieces = new Piece[6, 10];
+        public static Piece[,] blackPieces = new Piece[6, 10];
 
-        public static bool turnoBlanco = true;
-
-        public static bool jugar = true;
-
-        public static List<string> movimientos = new List<string>();
-
-        public static Pieza copiaPiezaEliminada = null;
+        public static bool isWhiteTurn = true;
+        public static bool isPlaying = true;
+        public static List<string> moveHistory = new List<string>();
+        public static Piece capturedPieceCopy = null;
 
         static void Main(string[] args)
         {
-            inicializacionDeTodo();
-
-            while (jugar)
-            {
-                juego();
-            }
+            InitializeGame();
+            while (isPlaying)
+                PlayTurn();
         }
 
-        public static void juego()
+        public static void PlayTurn()
         {
-            reiniciarComerAlPaso();
-            copiaPiezaEliminada = null;
+            ResetEnPassant();
+            capturedPieceCopy = null;
 
             ArrayList output = null;
             string input;
-            resetTable();
-            ArrayList correcto = null;
-            bool Enroque = false;
+            RefreshBoard();
+            ArrayList result = null;
+            bool castled = false;
+            bool moved = false;
 
-            bool alguienGano = true;
-
-            bool repetir = false;
             do
             {
-                alguienGano = comprovarJaqueMate(LugaresOcupados(), LugaresOcupadosNegras(), LugaresOcupadosBlancas());
+                bool gameOn = IsCheckmate(AllOccupiedSquares(), BlackOccupiedSquares(), WhiteOccupiedSquares());
 
-                if (!alguienGano)
+                if (!gameOn)
                 {
                     int counter = 1;
-                    if (!turnoBlanco) Console.WriteLine("\nGanaron blancas\n");
-                    else Console.WriteLine("\nGanaron negras\n");
-
+                    Console.WriteLine(isWhiteTurn ? "\nBlack wins\n" : "\nWhite wins\n");
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.BackgroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine();
-                    Console.WriteLine("Movimientos de la partida: ");
-                    foreach (string movimiento in movimientos)
+                    Console.WriteLine("\nMove history:");
+                    foreach (string move in moveHistory)
                     {
-                        if (counter % 2 == 0)
-                        {
-                            Console.WriteLine(movimiento);
-                        }
-                        else
-                        {
-                            Console.Write("{0} -> {1} -", (counter / 2) + 1, movimiento);
-                        }
+                        if (counter % 2 == 0) Console.WriteLine(move);
+                        else Console.Write("{0} -> {1} -", (counter / 2) + 1, move);
                         counter++;
                     }
-
                     Console.WriteLine("\n");
                     Environment.Exit(0);
                 }
+
                 Console.WriteLine();
                 Console.BackgroundColor = ConsoleColor.Cyan;
-                if (turnoBlanco) Console.WriteLine("Torno blancas: ");
-                else Console.WriteLine("Turno negras:");
-                Console.Write("Ingrese su movimiento: ");
+                Console.WriteLine(isWhiteTurn ? "White's turn:" : "Black's turn:");
+                Console.Write("Enter move: ");
                 input = Console.ReadLine();
                 Console.WriteLine();
-                output = conversion(input);
+                output = ParseInput(input);
 
                 if (output != null && output.Count == 3)
                 {
                     switch (output[1])
                     {
-                        case Piezas pieza when (pieza == Piezas.peon && (bool)output[2] == false):
-                            correcto = moverPeon(output[0].ToString());
-                            break;
-                        case Piezas pieza when (pieza != Piezas.rey && (bool)output[2] == false):
-                            correcto = moverPieza(output[0].ToString(), (Piezas)output[1]);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.rey && (bool)output[2] == false):
-                            correcto = moverPieza(output[0].ToString(), (Piezas)output[1]);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.peon && (bool)output[2] == true):
-                            correcto = ComerPeon(output[0].ToString(), input);
-                            break;
-                        case Piezas pieza when (pieza != Piezas.rey && (bool)output[2] == true):
-                            correcto = comerPieza(output[0].ToString(), (Piezas)output[1]);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.rey && (bool)output[2] == true):
-                            correcto = comerPieza(output[0].ToString(), (Piezas)output[1]);
-                            break;
+                        case PieceType p when p == PieceType.Pawn && !(bool)output[2]:
+                            result = TryMovePawn(output[0].ToString()); break;
+                        case PieceType p when p != PieceType.King && !(bool)output[2]:
+                            result = TryMovePiece(output[0].ToString(), (PieceType)output[1]); break;
+                        case PieceType p when p == PieceType.King && !(bool)output[2]:
+                            result = TryMovePiece(output[0].ToString(), (PieceType)output[1]); break;
+                        case PieceType p when p == PieceType.Pawn && (bool)output[2]:
+                            result = TryCapturePawn(output[0].ToString(), input); break;
+                        case PieceType p when p != PieceType.King && (bool)output[2]:
+                            result = TryCapturePiece(output[0].ToString(), (PieceType)output[1]); break;
+                        case PieceType p when p == PieceType.King && (bool)output[2]:
+                            result = TryCapturePiece(output[0].ToString(), (PieceType)output[1]); break;
                     }
                 }
                 else if (output != null && output.Count == 6)
                 {
                     switch (output[1])
                     {
-                        case Piezas pieza when (pieza == Piezas.torre && (bool)output[2] == false && (bool)output[3] && !(bool)output[4]):
-                            correcto = moverPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.torre && (bool)output[2] == false && !(bool)output[3] && (bool)output[4]):
-                            correcto = moverPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
+                        case PieceType p when p == PieceType.Rook && !(bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryMovePieceSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Rook && !(bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryMovePieceSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Knight && !(bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryMovePieceSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Knight && !(bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryMovePieceSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Queen && !(bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryMovePieceSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Queen && !(bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryMovePieceSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Bishop && !(bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryMovePieceSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Bishop && !(bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryMovePieceSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
 
-                        case Piezas pieza when (pieza == Piezas.caballo && (bool)output[2] == false && (bool)output[3] && !(bool)output[4]):
-                            correcto = moverPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.caballo && (bool)output[2] == false && !(bool)output[3] && (bool)output[4]):
-                            correcto = moverPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == false && (bool)output[3] && !(bool)output[4]):
-                            correcto = moverPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == false && !(bool)output[3] && (bool)output[4]):
-                            correcto = moverPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.alfil && (bool)output[2] == false && (bool)output[3] && !(bool)output[4]):
-                            correcto = moverPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.alfil && (bool)output[2] == false && !(bool)output[3] && (bool)output[4]):
-                            correcto = moverPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-
-
-                        case Piezas pieza when (pieza == Piezas.torre && (bool)output[2] == true && (bool)output[3] && !(bool)output[4]):
-                            correcto = comerPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.torre && (bool)output[2] == true && !(bool)output[3] && (bool)output[4]):
-                            correcto = comerPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.caballo && (bool)output[2] == true && (bool)output[3] && !(bool)output[4]):
-                            correcto = comerPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.caballo && (bool)output[2] == true && !(bool)output[3] && (bool)output[4]):
-                            correcto = comerPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == true && (bool)output[3] && !(bool)output[4]):
-                            correcto = comerPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == true && !(bool)output[3] && (bool)output[4]):
-                            correcto = comerPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == true && (bool)output[3] && !(bool)output[4]):
-                            correcto = comerPiezaEspecificoLetra(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
-                        case Piezas pieza when (pieza == Piezas.dama && (bool)output[2] == true && !(bool)output[3] && (bool)output[4]):
-                            correcto = comerPiezaEspecificoNumero(output[0].ToString(), (Piezas)output[1], (List<string>)output[5], input);
-                            break;
+                        case PieceType p when p == PieceType.Rook && (bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryCaptureSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Rook && (bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryCaptureSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Knight && (bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryCaptureSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Knight && (bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryCaptureSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Queen && (bool)output[2] && (bool)output[3] && !(bool)output[4]:
+                            result = TryCaptureSpecificFile(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
+                        case PieceType p when p == PieceType.Queen && (bool)output[2] && !(bool)output[3] && (bool)output[4]:
+                            result = TryCaptureSpecificRank(output[0].ToString(), (PieceType)output[1], (List<string>)output[5], input); break;
                     }
                 }
-                else if (output != null && output[1].GetType().ToString() == "Ajedrez.Program+Mov")
+                else if (output != null && output[1].GetType().ToString() == "Chess.Program+MoveType")
                 {
-                    if (output != null && output.Count == 2 && (Mov)output[1] == Mov.enroque && correcto == null)
+                    if (output.Count == 2 && (MoveType)output[1] == MoveType.Castling && result == null)
                     {
+                        castled = isWhiteTurn
+                            ? TryCastle(output[0].ToString(), whiteKing)
+                            : TryCastle(output[0].ToString(), blackKing);
 
-                        if (turnoBlanco)
-                        {
-                            Enroque = enroque(output[0].ToString(), reyBlanco);
-                        }
-                        else
-                        {
-                            Enroque = enroque(output[0].ToString(), reyNegro);
-                        }
-
-                        if (Enroque)
-                        {
-                            repetir = true;
-                        }
+                        if (castled) moved = true;
                     }
                 }
 
-                if (!Enroque && output != null && correcto != null)
-                {
-                    repetir = comprovarSiFunciona((Pieza)correcto[0], correcto[1].ToString());
-                }
+                if (!castled && output != null && result != null)
+                    moved = ValidateMove((Piece)result[0], result[1].ToString());
 
-                if (!repetir)
+                if (!moved)
                 {
-                    resetTable();
-                    Console.WriteLine("Error");
+                    RefreshBoard();
+                    Console.WriteLine("Invalid move");
                 }
                 else
                 {
-                    movimientos.Add(input);
+                    moveHistory.Add(input);
                 }
 
-            } while (!repetir);
+            } while (!moved);
 
-            if ((output.Count == 3 || output.Count == 6) && turnoBlanco && (bool)output[2] == true)
+            if ((output.Count == 3 || output.Count == 6) && isWhiteTurn && (bool)output[2])
             {
-                eliminar((Piezas)output[1], true);
-                if ((Piezas)output[1] == Piezas.peon)
-                {
-                    cambioDePieza();
-                }
+                RemoveCaptured((PieceType)output[1], true);
+                if ((PieceType)output[1] == PieceType.Pawn) PromotePawn();
             }
-            else if ((output.Count == 3 || output.Count == 6) && !turnoBlanco && (bool)output[2] == true)
+            else if ((output.Count == 3 || output.Count == 6) && !isWhiteTurn && (bool)output[2])
             {
-                eliminar((Piezas)output[1], false);
-                if ((Piezas)output[1] == Piezas.peon)
-                {
-                    cambioDePieza();
-                }
+                RemoveCaptured((PieceType)output[1], false);
+                if ((PieceType)output[1] == PieceType.Pawn) PromotePawn();
             }
 
-            turnoBlanco = !turnoBlanco;
+            isWhiteTurn = !isWhiteTurn;
         }
 
-        //Cambiar tipo de pieza si peon llega al final
-        public static void cambioDePieza()
+        public static void PromotePawn()
         {
-            bool cambio = false;
-            Peon peonCambiar = null;
-            if (turnoBlanco)
-            {
-                foreach (Peon item in peonesBlancos)
-                {
-                    if (item != null)
-                    {
-                        cambio = item.llegarAlFilnal();
+            bool promoted = false;
+            Pawn pawnToPromote = null;
 
-                        if (cambio)
-                        {
-                            peonCambiar = item;
-                            break;
-                        }
-                    }
-                }
-            }
-            else
+            Pawn[] pawns = isWhiteTurn ? whitePawns : blackPawns;
+            foreach (Pawn p in pawns)
             {
-                foreach (Peon item in peonesNegros)
-                {
-                    if (item != null)
-                    {
-                        cambio = item.llegarAlFilnal();
-
-                        if (cambio)
-                        {
-                            peonCambiar = item;
-                            break;
-                        }
-                    }
-                }
+                if (p != null && p.ReachedPromotion()) { pawnToPromote = p; promoted = true; break; }
             }
 
-            if (cambio)
+            if (!promoted) return;
+
+            int globalIndex = 0;
+            foreach (Piece p in allPieces) { if (p == pawnToPromote) break; globalIndex++; }
+
+            string pos = pawnToPromote.Position;
+            bool repeat = true;
+
+            while (repeat)
             {
-                int indice = 0;
-                foreach (Pieza piez in piezas)
+                Console.WriteLine("Promote pawn to:\n\tKnight = n\n\tBishop = b\n\tRook = r\n\tQueen = q\n-----------------------------");
+                Console.Write("Piece: ");
+                string choice = Console.ReadLine().ToLower().Trim();
+
+                if (choice != "n" && choice != "b" && choice != "r" && choice != "q")
                 {
-                    if (piez == peonCambiar)
-                    {
-                        break;
-                    }
-                    indice++;
+                    RefreshBoard();
+                    Console.WriteLine("Invalid choice");
                 }
-                string posicionPeon = peonCambiar.Posicion;
-                bool repetir = true;
-
-                while (repetir)
+                else
                 {
-                    Console.WriteLine("¿A que pieza quiere combertir el peon?:\n\tCaballo = c\n\tAlfil = a\n\tTorre = t\n\tDama = d\n-----------------------------");
-                    Console.Write("Pieza : ");
+                    repeat = false;
+                    int typeIndex = 0;
+                    int colorIndex = 0;
 
-                    string inputPieza = Console.ReadLine().ToLower().Trim();
+                    Piece[,] coloredPieces = isWhiteTurn ? whitePieces : blackPieces;
 
-                    if (inputPieza != "c" && inputPieza != "a" && inputPieza != "t" && inputPieza != "d")
+                    foreach (Piece p in coloredPieces) { if (p == pawnToPromote) break; colorIndex++; }
+
+                    if (isWhiteTurn)
                     {
-                        resetTable();
-                        Console.WriteLine("Error");
+                        switch (choice)
+                        {
+                            case "n":
+                                foreach (Piece p in whiteKnights) { if (p == null) break; typeIndex++; }
+                                var wk = new Knight('n', pos, true);
+                                allPieces[globalIndex / 10, globalIndex % 10] = wk;
+                                whiteKnights[typeIndex] = wk;
+                                whitePieces[colorIndex / 10, colorIndex % 10] = wk;
+                                break;
+                            case "b":
+                                foreach (Piece p in whiteBishops) { if (p == null) break; typeIndex++; }
+                                var wb = new Bishop('b', pos, true);
+                                allPieces[globalIndex / 10, globalIndex % 10] = wb;
+                                whiteBishops[typeIndex] = wb;
+                                whitePieces[colorIndex / 10, colorIndex % 10] = wb;
+                                break;
+                            case "r":
+                                foreach (Piece p in whiteRooks) { if (p == null) break; typeIndex++; }
+                                var wr = new Rook('r', pos, true);
+                                allPieces[globalIndex / 10, globalIndex % 10] = wr;
+                                whiteRooks[typeIndex] = wr;
+                                whitePieces[colorIndex / 10, colorIndex % 10] = wr;
+                                break;
+                            case "q":
+                                foreach (Piece p in whiteQueen) { if (p == null) break; typeIndex++; }
+                                var wq = new Queen('q', pos, true);
+                                allPieces[globalIndex / 10, globalIndex % 10] = wq;
+                                whiteQueen[typeIndex] = wq;
+                                whitePieces[colorIndex / 10, colorIndex % 10] = wq;
+                                break;
+                        }
                     }
                     else
                     {
-                        repetir = false;
-                        int counter = 0;
-                        int counter2 = 0;
-                        if (turnoBlanco)
+                        switch (choice)
                         {
-
-                            foreach (Pieza pieza in piezasBlancas)
-                            {
-                                if (pieza == peonCambiar) break;
-
-                                counter2++;
-                            }
-
-                            switch (inputPieza)
-                            {
-                                case "c":
-                                    foreach (Pieza pieza in caballosBlancos)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-
-                                    Caballo caballoDePeon = new Caballo('c', posicionPeon, true);
-                                    piezas[indice / 10, indice % 10] = caballoDePeon;
-                                    caballosBlancos[counter] = caballoDePeon;
-                                    piezasBlancas[counter2 / 10, counter2 % 10] = caballoDePeon;
-                                    break;
-                                case "a":
-                                    foreach (Pieza pieza in alfilesBlancos)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-
-                                    Alfil alfilDePeon = new Alfil('a', posicionPeon, true);
-                                    piezas[indice / 10, indice % 10] = alfilDePeon;
-                                    alfilesBlancos[counter] = alfilDePeon;
-                                    piezasBlancas[counter2 / 10, counter2 % 10] = alfilDePeon;
-                                    break;
-                                case "t":
-                                    foreach (Pieza pieza in torresBlancas)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-                                    Torre torreDePeon = new Torre('t', posicionPeon, true);
-                                    piezas[indice / 10, indice % 10] = torreDePeon;
-                                    torresBlancas[counter] = torreDePeon;
-                                    piezasBlancas[counter2 / 10, counter2 % 10] = torreDePeon;
-                                    break;
-                                case "d":
-                                    foreach (Pieza pieza in damaBlanca)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-                                    Dama damaDePeon = new Dama('d', posicionPeon, true);
-                                    piezas[indice / 10, indice % 10] = damaDePeon;
-                                    damaBlanca[counter] = damaDePeon;
-                                    piezasBlancas[counter2 / 10, counter2 % 10] = damaDePeon;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            foreach (Pieza pieza in piezasNegras)
-                            {
-                                if (pieza == peonCambiar) break;
-
-                                counter2++;
-                            }
-
-                            switch (inputPieza)
-                            {
-                                case "c":
-                                    foreach (Pieza pieza in caballosNegros)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-                                    Caballo caballoDePeon = new Caballo('c', posicionPeon, false);
-                                    piezas[indice / 10, indice % 10] = caballoDePeon;
-                                    caballosNegros[counter] = caballoDePeon;
-                                    piezasNegras[counter2 / 10, counter2 % 10] = caballoDePeon;
-                                    break;
-                                case "a":
-                                    foreach (Pieza pieza in alfilesNegros)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-
-                                    Alfil alfilDePeon = new Alfil('a', posicionPeon, false);
-                                    piezas[indice / 10, indice % 10] = alfilDePeon;
-                                    alfilesNegros[counter] = alfilDePeon;
-                                    piezasNegras[counter2 / 10, counter2 % 10] = alfilDePeon;
-                                    break;
-                                case "t":
-                                    foreach (Pieza pieza in torresNegras)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-
-                                    Torre torreDePeon = new Torre('t', posicionPeon, false);
-                                    piezas[indice / 10, indice % 10] = torreDePeon;
-                                    torresNegras[counter] = torreDePeon;
-                                    piezasNegras[counter2 / 10, counter2 % 10] = torreDePeon;
-                                    break;
-                                case "d":
-
-                                    foreach (Pieza pieza in damaNegra)
-                                    {
-                                        if (pieza == null) break;
-
-                                        counter++;
-                                    }
-
-                                    Dama damaDePeon = new Dama('d', posicionPeon, false);
-                                    piezas[indice / 10, indice % 10] = damaDePeon;
-                                    damaNegra[counter] = damaDePeon;
-                                    piezasNegras[counter2 / 10, counter2 % 10] = damaDePeon;
-                                    break;
-                            }
+                            case "n":
+                                foreach (Piece p in blackKnights) { if (p == null) break; typeIndex++; }
+                                var bk = new Knight('n', pos, false);
+                                allPieces[globalIndex / 10, globalIndex % 10] = bk;
+                                blackKnights[typeIndex] = bk;
+                                blackPieces[colorIndex / 10, colorIndex % 10] = bk;
+                                break;
+                            case "b":
+                                foreach (Piece p in blackBishops) { if (p == null) break; typeIndex++; }
+                                var bb = new Bishop('b', pos, false);
+                                allPieces[globalIndex / 10, globalIndex % 10] = bb;
+                                blackBishops[typeIndex] = bb;
+                                blackPieces[colorIndex / 10, colorIndex % 10] = bb;
+                                break;
+                            case "r":
+                                foreach (Piece p in blackRooks) { if (p == null) break; typeIndex++; }
+                                var br = new Rook('r', pos, false);
+                                allPieces[globalIndex / 10, globalIndex % 10] = br;
+                                blackRooks[typeIndex] = br;
+                                blackPieces[colorIndex / 10, colorIndex % 10] = br;
+                                break;
+                            case "q":
+                                foreach (Piece p in blackQueen) { if (p == null) break; typeIndex++; }
+                                var bq = new Queen('q', pos, false);
+                                allPieces[globalIndex / 10, globalIndex % 10] = bq;
+                                blackQueen[typeIndex] = bq;
+                                blackPieces[colorIndex / 10, colorIndex % 10] = bq;
+                                break;
                         }
                     }
                 }
             }
         }
 
-        //Comprueba si un movimiento no genera jaques
-        public static bool comprovarSiFunciona(Pieza pieza, string posicion)
+        public static bool ValidateMove(Piece piece, string targetPosition)
         {
-            bool permitirMovimiento = false;
+            string previousPosition = piece.Position;
 
-            Pieza piezaAnalizar = pieza;
-            string posicionAntelacion = piezaAnalizar.Posicion;
+            foreach (Piece p in allPieces)
+                if (p != null && p.Position == targetPosition) { capturedPieceCopy = p; break; }
 
-            foreach (Pieza item in piezas)
-            {
-                if (item != null && item.Posicion == posicion)
-                {
-                    copiaPiezaEliminada = item;
-                    break;
-                }
-            }
+            capturedPieceCopy = null;
+            piece.Position = targetPosition;
 
-            copiaPiezaEliminada = null;
-            piezaAnalizar.Posicion = posicion;
+            bool allowed = isWhiteTurn
+                ? whiteKing[0].IsInCheck(BlackAttackedSquares(AllOccupiedSquares(), BlackOccupiedSquares(), WhiteOccupiedSquares()))
+                : blackKing[0].IsInCheck(WhiteAttackedSquares(AllOccupiedSquares(), BlackOccupiedSquares(), WhiteOccupiedSquares()));
 
-            if (turnoBlanco) permitirMovimiento = reyBlanco[0].comprovarJaque(LugaresAtacadosNegros(LugaresOcupados(), LugaresOcupadosNegras(), LugaresOcupadosBlancas()));
-            else permitirMovimiento = reyNegro[0].comprovarJaque(LugaresAtacadosBlancos(LugaresOcupados(), LugaresOcupadosNegras(), LugaresOcupadosBlancas()));
-
-            if (!permitirMovimiento)
-            {
-                piezaAnalizar.Posicion = posicionAntelacion;
-                return false;
-            }
+            if (!allowed) { piece.Position = previousPosition; return false; }
             return true;
         }
 
-        public static bool comprovarSiFunciona2(Pieza pieza, string posicion)
+        public static bool ValidateMove2(Piece piece, string targetPosition)
         {
-            bool permitirMovimiento = false;
+            string previousPosition = piece.Position;
+            piece.Position = targetPosition;
 
-            Pieza piezaAnalizar = pieza;
-            string posicionAntelacion = piezaAnalizar.Posicion;
-            piezaAnalizar.Posicion = posicion;
+            bool allowed = isWhiteTurn
+                ? whiteKing[0].IsInCheck(BlackAttackedSquares(AllOccupiedSquares(), BlackOccupiedSquares(), WhiteOccupiedSquares()))
+                : blackKing[0].IsInCheck(WhiteAttackedSquares(AllOccupiedSquares(), BlackOccupiedSquares(), WhiteOccupiedSquares()));
 
-            if (turnoBlanco) permitirMovimiento = reyBlanco[0].comprovarJaque(LugaresAtacadosNegros(LugaresOcupados(), LugaresOcupadosNegras(), LugaresOcupadosBlancas()));
-            else permitirMovimiento = reyNegro[0].comprovarJaque(LugaresAtacadosBlancos(LugaresOcupados(), LugaresOcupadosNegras(), LugaresOcupadosBlancas()));
-
-            piezaAnalizar.Posicion = posicionAntelacion;
-            if (!permitirMovimiento) return false;
+            piece.Position = previousPosition;
+            if (!allowed) return false;
             return true;
         }
 
-        //comprueva jaque mates
-        public static bool comprovarJaqueMate(string[] posicionesOcupadas, string[] posicionesOcupadasNegras, string[] posicionesOcupadasBlancas)
+        public static bool IsCheckmate(string[] occupied, string[] blackOccupied, string[] whiteOccupied)
         {
-            List<string> lugaresAtacadosOtroColor = new List<string>();
-            bool seguir = true;
-            Rey rey = null;
-            if (turnoBlanco)
+            List<string> enemyAttacked;
+            King king;
+
+            if (isWhiteTurn)
             {
-                lugaresAtacadosOtroColor = LugaresAtacadosNegros(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                lugaresAtacadosOtroColor.RemoveAll(n => n == "" || n == null || int.TryParse(n, out int a));
-                rey = reyBlanco[0];
+                enemyAttacked = BlackAttackedSquares(occupied, blackOccupied, whiteOccupied);
+                enemyAttacked.RemoveAll(n => n == "" || n == null || int.TryParse(n, out _));
+                king = whiteKing[0];
             }
             else
             {
-                lugaresAtacadosOtroColor = LugaresAtacadosBlancos(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                lugaresAtacadosOtroColor.RemoveAll(n => n == "" || n == null || int.TryParse(n, out int a));
-                rey = reyNegro[0];
+                enemyAttacked = WhiteAttackedSquares(occupied, blackOccupied, whiteOccupied);
+                enemyAttacked.RemoveAll(n => n == "" || n == null || int.TryParse(n, out _));
+                king = blackKing[0];
             }
 
-            seguir = rey.comprovarJaque(lugaresAtacadosOtroColor);
-            List<string> checking = new List<string>();
-            if (!seguir)
+            if (king.IsInCheck(enemyAttacked)) return true;
+
+            if (isWhiteTurn)
             {
-                bool noMate = false;
-                if (turnoBlanco)
-                {
-                    noMate = plantillaJaqueMate(reyBlanco, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(peonesBlancos, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(torresBlancas, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(caballosBlancos, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(alfilesBlancos, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(damaBlanca, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                }
-                else
-                {
-                    noMate = plantillaJaqueMate(reyNegro, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(peonesNegros, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(torresNegras, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(caballosNegros, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(alfilesNegros, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                    noMate = plantillaJaqueMate(damaNegra, posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                    if (noMate) return true;
-                }
+                if (CheckmateCheck(whiteKing, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(whitePawns, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(whiteRooks, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(whiteKnights, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(whiteBishops, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(whiteQueen, occupied, blackOccupied, whiteOccupied)) return true;
             }
-            else return true;
+            else
+            {
+                if (CheckmateCheck(blackKing, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(blackPawns, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(blackRooks, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(blackKnights, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(blackBishops, occupied, blackOccupied, whiteOccupied)) return true;
+                if (CheckmateCheck(blackQueen, occupied, blackOccupied, whiteOccupied)) return true;
+            }
+
             return false;
         }
 
-        public static bool plantillaJaqueMate<T>(T[] piezasAnalizar, string[] posicionesOcupadas, string[] posicionesOcupadasNegras, string[] posicionesOcupadasBlancas) where T : Pieza
+        public static bool CheckmateCheck<T>(T[] piecesToCheck, string[] occupied, string[] blackOccupied, string[] whiteOccupied) where T : Piece
         {
-            List<string> checking = new List<string>();
-            bool noMate = false;
+            List<string> enemyAttacked = null;
 
-            List<string> lugaresAtacadosColorContrario = null;
-
-            string c = piezasAnalizar.GetType().ToString();
-
-            if (piezasAnalizar.GetType().ToString() == "Ajedrez.Rey[]")
+            if (piecesToCheck.GetType().ToString() == "Chess.King[]")
             {
-                lugaresAtacadosColorContrario = piezasAnalizar[0].Blanca ? LugaresAtacadosNegros(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas) : LugaresAtacadosBlancos(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas);
-                lugaresAtacadosColorContrario.RemoveAll(n => n == "" || n == null || int.TryParse(n, out int a));
+                enemyAttacked = piecesToCheck[0].IsWhite
+                    ? BlackAttackedSquares(occupied, blackOccupied, whiteOccupied)
+                    : WhiteAttackedSquares(occupied, blackOccupied, whiteOccupied);
+                enemyAttacked.RemoveAll(n => n == "" || n == null || int.TryParse(n, out _));
             }
-            foreach (T pieza in piezasAnalizar)
+
+            foreach (T piece in piecesToCheck)
             {
-                if (pieza != null)
-                {
-                    checking = pieza.PosicionesValidas(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas, lugaresAtacadosColorContrario);
-                    checking.AddRange(pieza.comer(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas, lugaresAtacadosColorContrario));
-                    if (checking != null)
-                    {
-                        foreach (string posicion in checking)
-                        {
-                            if (posicion != null)
-                            {
-                                noMate = comprovarSiFunciona2(pieza, posicion);
-                                if (noMate) return true;
-                            }
-                        }
-                    }
-                }
+                if (piece == null) continue;
+                List<string> candidates = piece.ValidSquares(occupied, blackOccupied, whiteOccupied, enemyAttacked);
+                candidates.AddRange(piece.Capture(occupied, blackOccupied, whiteOccupied, enemyAttacked));
+
+                foreach (string sq in candidates)
+                    if (sq != null && ValidateMove2(piece, sq)) return true;
             }
+
             return false;
         }
 
-        //Elimina piezas si se comen
-        public static void eliminar(Piezas pieza, bool blanca)
+        public static void RemoveCaptured(PieceType pieceType, bool isWhite)
         {
-            switch (pieza)
+            switch (pieceType)
             {
-                case Piezas.torre:
-
-                    if (blanca) plantillaEliminarBlancas(torresBlancas);
-                    else plantillaEliminarNegras(torresNegras);
-
-                    break;
-                case Piezas.caballo:
-                    if (blanca) plantillaEliminarBlancas(caballosBlancos);
-                    else plantillaEliminarNegras(caballosNegros);
-                    break;
-                case Piezas.alfil:
-                    if (blanca) plantillaEliminarBlancas(alfilesBlancos);
-                    else plantillaEliminarNegras(alfilesNegros);
-                    break;
-                case Piezas.dama:
-
-                    if (blanca) plantillaEliminarBlancas(damaBlanca);
-                    else plantillaEliminarNegras(damaNegra);
-                    break;
-                case Piezas.rey:
-
-                    if (blanca) plantillaEliminarBlancas(reyBlanco);
-                    else plantillaEliminarNegras(reyNegro);
-                    break;
-                case Piezas.peon:
-
-                    if (blanca) plantillaEliminarBlancas(peonesBlancos);
-                    else plantillaEliminarNegras(peonesNegros);
-                    break;
+                case PieceType.Rook:
+                    if (isWhite) RemoveCapturedByWhite(whiteRooks); else RemoveCapturedByBlack(blackRooks); break;
+                case PieceType.Knight:
+                    if (isWhite) RemoveCapturedByWhite(whiteKnights); else RemoveCapturedByBlack(blackKnights); break;
+                case PieceType.Bishop:
+                    if (isWhite) RemoveCapturedByWhite(whiteBishops); else RemoveCapturedByBlack(blackBishops); break;
+                case PieceType.Queen:
+                    if (isWhite) RemoveCapturedByWhite(whiteQueen); else RemoveCapturedByBlack(blackQueen); break;
+                case PieceType.King:
+                    if (isWhite) RemoveCapturedByWhite(whiteKing); else RemoveCapturedByBlack(blackKing); break;
+                case PieceType.Pawn:
+                    if (isWhite) RemoveCapturedByWhite(whitePawns); else RemoveCapturedByBlack(blackPawns); break;
             }
         }
 
-        public static void plantillaEliminarBlancas(Pieza[] piezaQueCome)
+        public static void RemoveCapturedByWhite(Piece[] attackers)
         {
-            int counter = 0;
-
-            foreach (Pieza pieza in piezaQueCome)
+            foreach (Piece attacker in attackers)
             {
-                counter = 0;
-                if (pieza != null)
+                if (attacker == null) continue;
+                int i = 0;
+                foreach (Piece blackPiece in blackPieces)
                 {
-                    foreach (Pieza piezaNegra in piezasNegras)
+                    if (blackPiece != null && blackPiece.Position == attacker.Position)
                     {
-                        if (piezaNegra != null && pieza != null && piezaNegra.Posicion == pieza.Posicion)
+                        char initial = blackPieces[i / 10, i % 10]?.PieceInitial ?? ' ';
+                        blackPieces[i / 10, i % 10] = null;
+
+                        if (i / 10 == 0) allPieces[1, i % 10] = null;
+                        else if (i / 10 == 1) allPieces[3, i % 10] = null;
+                        else if (i / 10 == 2) allPieces[5, i % 10] = null;
+                        else if (i / 10 == 3) allPieces[7, i % 10] = null;
+                        else if (i / 10 == 4) allPieces[9, i % 10] = null;
+                        else if (i / 10 == 5) allPieces[11, i % 10] = null;
+
+                        switch (initial)
                         {
-                            char inicial = ' ';
-                            if (piezasNegras[counter / 10, counter % 10] != null)
-                            {
-                                inicial = piezasNegras[counter / 10, counter % 10].InicilPieza;
-                                piezasNegras[counter / 10, counter % 10] = null;
-
-                                if (counter / 10 == 0) piezas[1, counter % 10] = null;
-                                else if (counter / 10 == 1) piezas[3, counter % 10] = null;
-                                else if (counter / 10 == 2) piezas[5, counter % 10] = null;
-                                else if (counter / 10 == 3) piezas[7, counter % 10] = null;
-                                else if (counter / 10 == 4) piezas[9, counter % 10] = null;
-                                else if (counter / 10 == 5) piezas[11, counter % 10] = null;
-
-                                switch (inicial)
-                                {
-                                    case 't':
-                                        torresNegras[counter % 10] = null;
-                                        break;
-                                    case 'a':
-                                        alfilesNegros[counter % 10] = null;
-                                        break;
-                                    case 'c':
-                                        caballosNegros[counter % 10] = null;
-                                        break;
-                                    case 'd':
-                                        damaNegra[counter % 10] = null;
-                                        break;
-                                    case 'r':
-                                        reyNegro[0] = null;
-                                        break;
-                                    case 'p':
-                                        peonesNegros[counter % 10] = null;
-                                        break;
-                                }
-                                break;
-                            }
+                            case 'r': blackRooks[i % 10] = null; break;
+                            case 'b': blackBishops[i % 10] = null; break;
+                            case 'n': blackKnights[i % 10] = null; break;
+                            case 'q': blackQueen[i % 10] = null; break;
+                            case 'k': blackKing[0] = null; break;
+                            case 'p': blackPawns[i % 10] = null; break;
                         }
-
-                        counter++;
+                        break;
                     }
+                    i++;
                 }
             }
         }
 
-        public static void plantillaEliminarNegras(Pieza[] piezaQueCome)
+        public static void RemoveCapturedByBlack(Piece[] attackers)
         {
-            int counter = 0;
-
-            foreach (Pieza pieza in piezaQueCome)
+            foreach (Piece attacker in attackers)
             {
-                counter = 0;
-                foreach (Pieza piezaOtroColor in piezasBlancas)
+                if (attacker == null) continue;
+                int i = 0;
+                foreach (Piece whitePiece in whitePieces)
                 {
-                    if (pieza != null && piezaOtroColor != null && piezaOtroColor.Posicion == pieza.Posicion)
+                    if (whitePiece != null && whitePiece.Position == attacker.Position)
                     {
-                        char inicial = ' ';
-                        if (piezasBlancas[counter / 10, counter % 10] != null)
+                        char initial = whitePieces[i / 10, i % 10]?.PieceInitial ?? ' ';
+                        whitePieces[i / 10, i % 10] = null;
+
+                        if (i / 10 == 0) allPieces[0, i % 10] = null;
+                        else if (i / 10 == 1) allPieces[2, i % 10] = null;
+                        else if (i / 10 == 2) allPieces[4, i % 10] = null;
+                        else if (i / 10 == 3) allPieces[6, i % 10] = null;
+                        else if (i / 10 == 4) allPieces[8, i % 10] = null;
+                        else if (i / 10 == 5) allPieces[10, i % 10] = null;
+
+                        switch (initial)
                         {
-                            inicial = piezasBlancas[counter / 10, counter % 10].InicilPieza;
-                            piezasBlancas[counter / 10, counter % 10] = null;
-
-                            if (counter / 10 == 0) piezas[0, counter % 10] = null;
-                            else if (counter / 10 == 1) piezas[2, counter % 10] = null;
-                            else if (counter / 10 == 2) piezas[4, counter % 10] = null;
-                            else if (counter / 10 == 3) piezas[6, counter % 10] = null;
-                            else if (counter / 10 == 4) piezas[8, counter % 10] = null;
-                            else if (counter / 10 == 5) piezas[10, counter % 10] = null;
-
-                            switch (inicial)
-                            {
-                                case 't':
-                                    torresBlancas[counter % 10] = null;
-                                    break;
-                                case 'a':
-                                    alfilesBlancos[counter % 10] = null;
-                                    break;
-                                case 'c':
-                                    caballosBlancos[counter % 10] = null;
-                                    break;
-                                case 'd':
-                                    damaBlanca[counter % 10] = null;
-                                    break;
-                                case 'r':
-                                    reyBlanco[0] = null;
-                                    break;
-                                case 'p':
-                                    peonesBlancos[counter % 10] = null;
-                                    break;
-                            }
-                            break;
+                            case 'r': whiteRooks[i % 10] = null; break;
+                            case 'b': whiteBishops[i % 10] = null; break;
+                            case 'n': whiteKnights[i % 10] = null; break;
+                            case 'q': whiteQueen[i % 10] = null; break;
+                            case 'k': whiteKing[0] = null; break;
+                            case 'p': whitePawns[i % 10] = null; break;
                         }
+                        break;
                     }
-
-                    counter++;
+                    i++;
                 }
             }
         }
 
-        //Hace la conversion del input y devuelve varios valores como la pieza que se va a mover, a donde etc
-        public static ArrayList conversion(string input)
+        public static ArrayList ParseInput(string input)
         {
-            //variable retorno
-            ArrayList retorno = new ArrayList();
-            string posicion = "";
-            Piezas? pieza = null;
-            bool? comer = null;
+            ArrayList result = new ArrayList();
+            string position = "";
+            PieceType? pieceType = null;
+            bool? capture = null;
+            bool specificFile = false;
+            bool specificRank = false;
 
-            bool especificoLetra = false;
-            bool especificoNumero = false;
+            string[] patterns =
+            {
+                "^[TCAD][a-h][a-h].*[1-8]$", "^[TCAD][1-8][a-h].*[1-8]$",
+                "^[TCAD][a-h]x[a-h].*[1-8]$", "^[TCAD][1-8]x[a-h].*[1-8]$",
+                "^[a-h][1-8]", "0-0", "0-0-0", "^[TCADR][a-h].*[1-8]$",
+                "^[a-h]x[a-h][1-8]$", "^[TCADR]x[a-h][1-8]$"
+            };
 
-            string[] pattern = { "^[TCAD][a-h][a-h].*[1-8]$", "^[TCAD][1-8][a-h].*[1-8]$", "^[TCAD][a-h]x[a-h].*[1-8]$", "^[TCAD][1-8]x[a-h].*[1-8]$", "^[a-h][1-8]", "0-0", "0-0-0", "^[TCADR][a-h].*[1-8]$", "^[a-h]x[a-h][1-8]$", "^[TCADR]x[a-h][1-8]$" };
             Match match = null;
-
-            Mov? mov = null;
-            int counter = 0;
-            foreach (string Pattern in pattern)
+            int matchIndex = 0;
+            foreach (string pattern in patterns)
             {
-                match = Regex.Match(input, Pattern);
-
-                if (match.Success)
-                {
-                    break;
-                }
-                counter++;
+                match = Regex.Match(input, pattern);
+                if (match.Success) break;
+                matchIndex++;
             }
 
-            //Dice lo que esta pasando
-            Func<Mov>[] actions = new Func<Mov>[]
+            if (!match.Success) return null;
+
+            Func<char, PieceType> getPieceType = c => c switch
             {
-                () => Mov.moverEspecificoLetra,
-                () => Mov.moverEspecificoNumero,
-                () => Mov.comerEspecificoLetra,
-                () => Mov.comerEspecificoNumero,
-                () => Mov.moverPeon,
-                () => Mov.enroque,
-                () => Mov.enroque,
-                () => Mov.moverPieza,
-                () => Mov.comerConPeon,
-                () => Mov.comerConPieza
-            };
-            //Dice la pieza por la letra
-            Func<char, Piezas> indexPieza = delegate (char inicial)
-            {
-                switch (inicial)
-                {
-                    case 'T':
-                        return Piezas.torre;
-                    case 'C':
-                        return Piezas.caballo;
-                    case 'A':
-                        return Piezas.alfil;
-                    case 'D':
-                        return Piezas.dama;
-                    default:
-                        return Piezas.rey;
-                }
+                'T' => PieceType.Rook,
+                'C' => PieceType.Knight,
+                'A' => PieceType.Bishop,
+                'D' => PieceType.Queen,
+                _ => PieceType.King
             };
 
-
-            if (match.Success)
+            MoveType[] moveTypes =
             {
-                bool? letrasONumeros = null;
-                Piezas inicialPieza = indexPieza(input[0]);
+                MoveType.MoveSpecificFile, MoveType.MoveSpecificRank,
+                MoveType.CaptureSpecificFile, MoveType.CaptureSpecificRank,
+                MoveType.MovePawn, MoveType.Castling, MoveType.Castling,
+                MoveType.MovePiece, MoveType.CaptureWithPawn, MoveType.CaptureWithPiece
+            };
 
-                List<string> nomenclaturaSimilar = null;
-                if (inicialPieza == Piezas.torre)
-                {
-                    if (turnoBlanco) nomenclaturaSimilar = nomenclaturaIgual(torresBlancas);
-                    else nomenclaturaSimilar = nomenclaturaIgual(torresNegras);
+            MoveType moveType = moveTypes[matchIndex];
+            PieceType initialPiece = getPieceType(input[0]);
 
-                    if (nomenclaturaSimilar != null)
-                    {
-                        foreach (string pos in nomenclaturaSimilar)
-                        {
-                            if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
-                            {
-                                if (turnoBlanco) letrasONumeros = LetrasONumeros(torresBlancas);
-                                else letrasONumeros = LetrasONumeros(torresNegras);
-                            }
-                        }
-                    }
-                }
-                else if (inicialPieza == Piezas.caballo)
-                {
-                    if (turnoBlanco) nomenclaturaSimilar = nomenclaturaIgual(caballosBlancos);
-                    else nomenclaturaSimilar = nomenclaturaIgual(caballosNegros);
+            List<string> ambiguousMoves = null;
+            bool? fileOrRank = null;
 
-                    if (nomenclaturaSimilar != null)
-                    {
-                        foreach (string pos in nomenclaturaSimilar)
-                        {
-                            if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
-                            {
-                                if (turnoBlanco) letrasONumeros = LetrasONumeros(caballosBlancos);
-                                else letrasONumeros = LetrasONumeros(caballosNegros);
-                            }
-                        }
-                    }
-                }
-                else if (inicialPieza == Piezas.dama)
-                {
-                    if (turnoBlanco) nomenclaturaSimilar = nomenclaturaIgual(damaBlanca);
-                    else nomenclaturaSimilar = nomenclaturaIgual(damaNegra);
-
-                    if (nomenclaturaSimilar != null)
-                    {
-                        foreach (string pos in nomenclaturaSimilar)
-                        {
-                            if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
-                            {
-                                if (turnoBlanco) letrasONumeros = LetrasONumeros(damaBlanca);
-                                else letrasONumeros = LetrasONumeros(damaNegra);
-                            }
-                        }
-                    }
-                }
-                else if (inicialPieza == Piezas.alfil)
-                {
-                    if (turnoBlanco) nomenclaturaSimilar = nomenclaturaIgual(alfilesBlancos);
-                    else nomenclaturaSimilar = nomenclaturaIgual(alfilesNegros);
-
-                    if (nomenclaturaSimilar != null)
-                    {
-                        foreach (string pos in nomenclaturaSimilar)
-                        {
-                            if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
-                            {
-                                if (turnoBlanco) letrasONumeros = LetrasONumeros(alfilesBlancos);
-                                else letrasONumeros = LetrasONumeros(alfilesNegros);
-                            }
-                        }
-                    }
-                }
-
-                mov = actions[counter]();
-
-                if (mov != null)
-                {
-                    switch (mov)
-                    {
-                        case Mov.moverPeon:
-                            posicion = input.ToUpper();
-                            pieza = Piezas.peon;
-                            comer = false;
-                            break;
-                        case Mov p when (p == Mov.moverPieza && letrasONumeros == null):
-                            posicion = input[1].ToString().ToUpper() + input[2];
-                            pieza = inicialPieza;
-                            comer = false;
-                            break;
-                        case Mov.comerConPeon:
-                            posicion = input[2].ToString().ToUpper() + input[3];
-                            pieza = Piezas.peon;
-                            comer = true;
-                            break;
-                        case Mov p when (p == Mov.comerConPieza && letrasONumeros == null):
-                            posicion = input[2].ToString().ToUpper() + input[3];
-                            pieza = inicialPieza;
-                            comer = true;
-                            break;
-                        case Mov.enroque:
-                            retorno.Add(input);
-                            retorno.Add(Mov.enroque);
-                            return retorno;
-                        case Mov p when (p == Mov.moverEspecificoLetra && letrasONumeros == true):
-                            posicion = input[2].ToString().ToUpper() + input[3];
-                            pieza = inicialPieza;
-                            comer = false;
-                            especificoLetra = true;
-                            especificoNumero = false;
-
-                            retorno.Add(posicion);
-                            retorno.Add(pieza);
-                            retorno.Add(comer);
-                            retorno.Add(especificoLetra);
-                            retorno.Add(especificoNumero);
-                            retorno.Add(nomenclaturaSimilar);
-                            return retorno;
-                        case Mov p when (p == Mov.moverEspecificoNumero && letrasONumeros == false):
-                            posicion = input[2].ToString().ToUpper() + input[3];
-                            pieza = inicialPieza;
-                            comer = false;
-                            especificoLetra = false;
-                            especificoNumero = true;
-
-                            retorno.Add(posicion);
-                            retorno.Add(pieza);
-                            retorno.Add(comer);
-                            retorno.Add(especificoLetra);
-                            retorno.Add(especificoNumero);
-                            retorno.Add(nomenclaturaSimilar);
-                            return retorno;
-                        case Mov p when (p == Mov.comerEspecificoLetra && letrasONumeros == true):
-                            posicion = input[3].ToString().ToUpper() + input[4];
-                            pieza = inicialPieza;
-                            comer = true;
-                            especificoLetra = true;
-                            especificoNumero = false;
-
-                            retorno.Add(posicion);
-                            retorno.Add(pieza);
-                            retorno.Add(comer);
-                            retorno.Add(especificoLetra);
-                            retorno.Add(especificoNumero);
-                            retorno.Add(nomenclaturaSimilar);
-                            return retorno;
-                        case Mov p when (p == Mov.comerEspecificoNumero && letrasONumeros == false):
-                            posicion = input[3].ToString().ToUpper() + input[4];
-                            pieza = inicialPieza;
-                            comer = true;
-                            especificoLetra = false;
-                            especificoNumero = true;
-
-                            retorno.Add(posicion);
-                            retorno.Add(pieza);
-                            retorno.Add(comer);
-                            retorno.Add(especificoLetra);
-                            retorno.Add(especificoNumero);
-                            retorno.Add(nomenclaturaSimilar);
-                            return retorno;
-
-                    }
-
-                    retorno.Add(posicion);
-                    retorno.Add(pieza);
-                    retorno.Add(comer);
-                    return retorno;
-                }
+            if (initialPiece == PieceType.Rook)
+            {
+                ambiguousMoves = isWhiteTurn ? FindAmbiguousMoves(whiteRooks) : FindAmbiguousMoves(blackRooks);
+                if (ambiguousMoves != null)
+                    foreach (string pos in ambiguousMoves)
+                        if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
+                            fileOrRank = isWhiteTurn ? DifferentFiles(whiteRooks) : DifferentFiles(blackRooks);
+            }
+            else if (initialPiece == PieceType.Knight)
+            {
+                ambiguousMoves = isWhiteTurn ? FindAmbiguousMoves(whiteKnights) : FindAmbiguousMoves(blackKnights);
+                if (ambiguousMoves != null)
+                    foreach (string pos in ambiguousMoves)
+                        if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
+                            fileOrRank = isWhiteTurn ? DifferentFiles(whiteKnights) : DifferentFiles(blackKnights);
+            }
+            else if (initialPiece == PieceType.Queen)
+            {
+                ambiguousMoves = isWhiteTurn ? FindAmbiguousMoves(whiteQueen) : FindAmbiguousMoves(blackQueen);
+                if (ambiguousMoves != null)
+                    foreach (string pos in ambiguousMoves)
+                        if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
+                            fileOrRank = isWhiteTurn ? DifferentFiles(whiteQueen) : DifferentFiles(blackQueen);
+            }
+            else if (initialPiece == PieceType.Bishop)
+            {
+                ambiguousMoves = isWhiteTurn ? FindAmbiguousMoves(whiteBishops) : FindAmbiguousMoves(blackBishops);
+                if (ambiguousMoves != null)
+                    foreach (string pos in ambiguousMoves)
+                        if (pos == input[input.Length - 2].ToString().ToUpper() + input[input.Length - 1])
+                            fileOrRank = isWhiteTurn ? DifferentFiles(whiteBishops) : DifferentFiles(blackBishops);
             }
 
-            return null;
+            switch (moveType)
+            {
+                case MoveType.MovePawn:
+                    position = input.ToUpper(); pieceType = PieceType.Pawn; capture = false; break;
+                case MoveType.MovePiece when fileOrRank == null:
+                    position = input[1].ToString().ToUpper() + input[2]; pieceType = initialPiece; capture = false; break;
+                case MoveType.CaptureWithPawn:
+                    position = input[2].ToString().ToUpper() + input[3]; pieceType = PieceType.Pawn; capture = true; break;
+                case MoveType.CaptureWithPiece when fileOrRank == null:
+                    position = input[2].ToString().ToUpper() + input[3]; pieceType = initialPiece; capture = true; break;
+                case MoveType.Castling:
+                    result.Add(input); result.Add(MoveType.Castling); return result;
+                case MoveType.MoveSpecificFile when fileOrRank == true:
+                    position = input[2].ToString().ToUpper() + input[3]; pieceType = initialPiece; capture = false;
+                    specificFile = true; specificRank = false;
+                    result.Add(position); result.Add(pieceType); result.Add(capture);
+                    result.Add(specificFile); result.Add(specificRank); result.Add(ambiguousMoves);
+                    return result;
+                case MoveType.MoveSpecificRank when fileOrRank == false:
+                    position = input[2].ToString().ToUpper() + input[3]; pieceType = initialPiece; capture = false;
+                    specificFile = false; specificRank = true;
+                    result.Add(position); result.Add(pieceType); result.Add(capture);
+                    result.Add(specificFile); result.Add(specificRank); result.Add(ambiguousMoves);
+                    return result;
+                case MoveType.CaptureSpecificFile when fileOrRank == true:
+                    position = input[3].ToString().ToUpper() + input[4]; pieceType = initialPiece; capture = true;
+                    specificFile = true; specificRank = false;
+                    result.Add(position); result.Add(pieceType); result.Add(capture);
+                    result.Add(specificFile); result.Add(specificRank); result.Add(ambiguousMoves);
+                    return result;
+                case MoveType.CaptureSpecificRank when fileOrRank == false:
+                    position = input[3].ToString().ToUpper() + input[4]; pieceType = initialPiece; capture = true;
+                    specificFile = false; specificRank = true;
+                    result.Add(position); result.Add(pieceType); result.Add(capture);
+                    result.Add(specificFile); result.Add(specificRank); result.Add(ambiguousMoves);
+                    return result;
+            }
+
+            result.Add(position); result.Add(pieceType); result.Add(capture);
+            return result;
         }
 
-        //Crea el tablero
-        public static void CrearTablero()
+        public static void DrawBoard()
         {
-            if (turnoBlanco) PlantillaCrearTablero(Tablero);
-            else PlantillaCrearTablero(TableroAlReves);
+            if (isWhiteTurn) DrawBoardTemplate(Board);
+            else DrawBoardTemplate(BoardFlipped);
         }
 
-        public static void PlantillaCrearTablero(string[,] Tablero_)
+        public static void DrawBoardTemplate(string[,] board)
         {
-            bool color = false;
+            bool isLight = false;
             int counter = 1;
-            string InicialDeLaCasilla;
-            bool añadirEspacio = true;
-            foreach (string a in Tablero_)
+            bool addSpacing = true;
+
+            foreach (string sq in board)
             {
-                color = !color;
-                switch (color)
-                {
-                    case true:
-                        Console.ForegroundColor = ConsoleColor.Black;
-                        Console.BackgroundColor = ConsoleColor.White;
-                        break;
-                    case false:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        break;
-                }
+                isLight = !isLight;
+                SetSquareColor(isLight);
 
-                InicialDeLaCasilla = inicialDevolver(a);
+                string display = GetSquareDisplay(sq);
 
-
-                if (añadirEspacio)
+                if (addSpacing)
                 {
                     for (int i = 0; i < 8; i++)
                     {
-                        if (i == 7)
-                        {
-                            Console.WriteLine("       ");
-                        }
-                        else
-                        {
-                            Console.Write("       ");
-                        }
-                        color = !color;
-
-                        switch (color)
-                        {
-                            case true:
-                                Console.BackgroundColor = ConsoleColor.White;
-                                break;
-                            case false:
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                break;
-                        }
+                        if (i == 7) Console.WriteLine("       ");
+                        else Console.Write("       ");
+                        isLight = !isLight;
+                        Console.BackgroundColor = isLight ? ConsoleColor.White : ConsoleColor.Black;
                     }
                 }
 
-                if (InicialDeLaCasilla == " ")
+                if (display == " ")
                 {
-                    if (counter % 8 == 0)
-                    {
-                        Console.WriteLine("       ");
-                        color = !color;
-                        añadirEspacio = true;
-                    }
-                    else
-                    {
-                        Console.Write("       ");
-                        añadirEspacio = false;
-                    }
+                    if (counter % 8 == 0) { Console.WriteLine("       "); isLight = !isLight; addSpacing = true; }
+                    else { Console.Write("       "); addSpacing = false; }
                 }
                 else
                 {
-                    if (counter % 8 == 0)
-                    {
-                        Console.WriteLine("  " + InicialDeLaCasilla.ToString().ToUpper() + "   ");
-                        color = !color;
-                        añadirEspacio = true;
-                    }
-                    else
-                    {
-                        Console.Write("  " + InicialDeLaCasilla.ToString().ToUpper() + "   ");
-                        añadirEspacio = false;
-                    }
+                    if (counter % 8 == 0) { Console.WriteLine("  " + display.ToUpper() + "   "); isLight = !isLight; addSpacing = true; }
+                    else { Console.Write("  " + display.ToUpper() + "   "); addSpacing = false; }
                 }
 
-                if (añadirEspacio)
+                if (addSpacing)
                 {
                     for (int i = 0; i < 8; i++)
                     {
-
-                        switch (color)
-                        {
-                            case true:
-                                Console.ForegroundColor = ConsoleColor.Black;
-                                Console.BackgroundColor = ConsoleColor.White;
-                                break;
-                            case false:
-                                Console.ForegroundColor = ConsoleColor.White;
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                break;
-                        }
-                        color = !color;
-
-                        if (i == 7)
-                        {
-                            Console.WriteLine("       ");
-                        }
-                        else
-                        {
-                            Console.Write("       ");
-                        }
-
-
+                        SetSquareColor(isLight);
+                        isLight = !isLight;
+                        if (i == 7) Console.WriteLine("       ");
+                        else Console.Write("       ");
                     }
                 }
 
@@ -1121,932 +686,466 @@ namespace Chees_console {
             }
         }
 
-        public static string inicialDevolver(string b)
+        public static string GetSquareDisplay(string square)
         {
-            string InicialDeLaCasilla = " ";
-
-
-            foreach (Pieza c in piezas)
+            foreach (Piece p in allPieces)
             {
-                if (c != null && c.Posicion == b)
+                if (p != null && p.Position == square)
                 {
-                    DevolverColor(c);
-                    InicialDeLaCasilla += c.InicilPieza.ToString();
+                    SetPieceColor(p);
+                    return " " + p.PieceInitial.ToString();
                 }
             }
-            return InicialDeLaCasilla;
+            return " ";
         }
 
-        //Reinicia el tablero
-        public static void resetTable()
+        public static void RefreshBoard()
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.Clear();
-            CrearTablero();
+            DrawBoard();
         }
 
-        //Devuelve el color de la pieza a traves de su propiedad "Blanco" que es booleana
-        public static void DevolverColor(Pieza c)
+        public static void SetSquareColor(bool isLight)
         {
-            switch (c.Blanca)
-            {
-                case true:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
-                case false:
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    break;
-            }
+            Console.ForegroundColor = isLight ? ConsoleColor.Black : ConsoleColor.White;
+            Console.BackgroundColor = isLight ? ConsoleColor.White : ConsoleColor.Black;
         }
 
-        //Devuelve los lugares atacados de cada color
-        public static List<string> LugaresAtacadosBlancos(string[] posicionesOcupadas, string[] posicionesOcupadasNegras, string[] posicionesOcupadasBlancas)
+        public static void SetPieceColor(Piece p)
         {
-            List<string> lugaresAtacados = new List<string>();
-            List<string> checking = new List<string>();
-
-            foreach (Pieza pieza in piezasBlancas)
-            {
-                if (pieza != null && pieza != copiaPiezaEliminada)
-                {
-                    checking = pieza.PosicionesValidas(posicionesOcupadas, null, null, null);
-                    if (checking != null) lugaresAtacados.AddRange(checking);
-                    checking = pieza.comer(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas, null);
-                    if (checking != null) lugaresAtacados.AddRange(checking);
-                }
-            }
-
-            checking = reyBlanco[0].lugaresAtacados();
-            if (checking != null) lugaresAtacados.AddRange(checking);
-
-            lugaresAtacados.RemoveAll(item => item == null);
-            return lugaresAtacados;
+            Console.ForegroundColor = p.IsWhite ? ConsoleColor.Magenta : ConsoleColor.DarkCyan;
         }
 
-        public static List<string> LugaresAtacadosNegros(string[] posicionesOcupadas, string[] posicionesOcupadasNegras, string[] posicionesOcupadasBlancas)
+        public static List<string> WhiteAttackedSquares(string[] occupied, string[] blackOccupied, string[] whiteOccupied)
         {
-            List<string> lugaresAtacados = new List<string>();
-            List<string> checking = new List<string>();
+            List<string> attacked = new List<string>();
 
-            foreach (Pieza pieza in piezasNegras)
+            foreach (Piece p in whitePieces)
             {
-                if (pieza != null && pieza != copiaPiezaEliminada)
-                {
-                    checking = pieza.PosicionesValidas(posicionesOcupadas, null, null, null);
-                    if (checking != null) lugaresAtacados.AddRange(checking);
-                    checking = pieza.comer(posicionesOcupadas, posicionesOcupadasNegras, posicionesOcupadasBlancas, null);
-                    if (checking != null) lugaresAtacados.AddRange(checking);
-                }
+                if (p == null || p == capturedPieceCopy) continue;
+                var squares = p.ValidSquares(occupied, null, null, null);
+                if (squares != null) attacked.AddRange(squares);
+                squares = p.Capture(occupied, blackOccupied, whiteOccupied, null);
+                if (squares != null) attacked.AddRange(squares);
             }
 
-            checking = reyNegro[0].lugaresAtacados();
-            if (checking != null) lugaresAtacados.AddRange(checking);
+            var kingSquares = whiteKing[0].AttackedSquares();
+            if (kingSquares != null) attacked.AddRange(kingSquares);
 
-            lugaresAtacados.RemoveAll(item => item == null);
-            return lugaresAtacados;
+            attacked.RemoveAll(item => item == null);
+            return attacked;
         }
 
-        //Analiza lugares ocupados de manera distinta cada uno
-        public static string[] LugaresOcupados()
+        public static List<string> BlackAttackedSquares(string[] occupied, string[] blackOccupied, string[] whiteOccupied)
         {
-            string[] posicionesOcupadas = new string[32];
-            int indice = 0;
+            List<string> attacked = new List<string>();
 
-            foreach (Pieza p in piezas)
+            foreach (Piece p in blackPieces)
             {
-                if (p != null && p != copiaPiezaEliminada)
-                {
-                    posicionesOcupadas[indice] = p.Posicion;
-                    indice++;
-                }
+                if (p == null || p == capturedPieceCopy) continue;
+                var squares = p.ValidSquares(occupied, null, null, null);
+                if (squares != null) attacked.AddRange(squares);
+                squares = p.Capture(occupied, blackOccupied, whiteOccupied, null);
+                if (squares != null) attacked.AddRange(squares);
             }
-            return posicionesOcupadas;
+
+            var kingSquares = blackKing[0].AttackedSquares();
+            if (kingSquares != null) attacked.AddRange(kingSquares);
+
+            attacked.RemoveAll(item => item == null);
+            return attacked;
         }
 
-        public static string[] LugaresOcupadosBlancas()
+        public static string[] AllOccupiedSquares()
         {
-            string[] posicionesOcupadas = new string[16];
-            int indice = 0;
-
-            foreach (Pieza p in piezasBlancas)
-            {
-                if (p != null && p != copiaPiezaEliminada)
-                {
-                    posicionesOcupadas[indice] = p.Posicion;
-                    indice++;
-                }
-            }
-            return posicionesOcupadas;
+            string[] occupied = new string[32];
+            int i = 0;
+            foreach (Piece p in allPieces)
+                if (p != null && p != capturedPieceCopy) occupied[i++] = p.Position;
+            return occupied;
         }
 
-        public static string[] LugaresOcupadosNegras()
+        public static string[] WhiteOccupiedSquares()
         {
-            string[] posicionesOcupadas = new string[16];
-            int indice = 0;
-
-            foreach (Pieza p in piezasNegras)
-            {
-                if (p != null)
-                {
-                    posicionesOcupadas[indice] = p.Posicion;
-                    indice++;
-                }
-            }
-            return posicionesOcupadas;
+            string[] occupied = new string[16];
+            int i = 0;
+            foreach (Piece p in whitePieces)
+                if (p != null && p != capturedPieceCopy) occupied[i++] = p.Position;
+            return occupied;
         }
 
-        //Inicializa los objetos
-        public static void inicializacionDeTodo()
+        public static string[] BlackOccupiedSquares()
         {
-            Peon peonA2 = new Peon('p', "A2", true);
-            Peon peonB2 = new Peon('p', "B2", true);
-            Peon peonC2 = new Peon('p', "C2", true);
-            Peon peonD2 = new Peon('p', "D2", true);
-            Peon peonE2 = new Peon('p', "E2", true);
-            Peon peonF2 = new Peon('p', "F2", true);
-            Peon peonG2 = new Peon('p', "G2", true);
-            Peon peonH2 = new Peon('p', "H2", true);
-
-            Peon[] IBpeones = { peonA2, peonB2, peonC2, peonD2, peonE2, peonF2, peonG2, peonH2, null, null };
-            peonesBlancos = IBpeones;
-
-
-            Peon peonA8 = new Peon('p', "A7", false);
-            Peon peonB8 = new Peon('p', "B7", false);
-            Peon peonC8 = new Peon('p', "C7", false);
-            Peon peonD8 = new Peon('p', "D7", false);
-            Peon peonE8 = new Peon('p', "E7", false);
-            Peon peonF8 = new Peon('p', "F7", false);
-            Peon peonG8 = new Peon('p', "G7", false);
-            Peon peonH8 = new Peon('p', "H7", false);
-
-            Peon[] INpeones = { peonA8, peonB8, peonC8, peonD8, peonE8, peonF8, peonG8, peonH8, null, null };
-            peonesNegros = INpeones;
-
-            Torre torreA1 = new Torre('t', "A1", true);
-            Torre torreH1 = new Torre('t', "H1", true);
-
-            Torre[] IBtorresBlancas = { torreA1, torreH1, null, null, null, null, null, null, null, null };
-            torresBlancas = IBtorresBlancas;
-
-            Torre torreA8 = new Torre('t', "A8", false);
-            Torre torreH8 = new Torre('t', "H8", false);
-
-            Torre[] INtorresNegras = { torreA8, torreH8, null, null, null, null, null, null, null, null };
-            torresNegras = INtorresNegras;
-
-            Caballo caballoB1 = new Caballo('c', "B1", true);
-            Caballo caballoF1 = new Caballo('c', "G1", true);
-
-            Caballo[] IBcaballosBlancos = { caballoB1, caballoF1, null, null, null, null, null, null, null, null };
-            caballosBlancos = IBcaballosBlancos;
-
-            Caballo caballoB8 = new Caballo('c', "B8", false);
-            Caballo caballoG8 = new Caballo('c', "G8", false);
-
-            Caballo[] INcaballosNegros = { caballoB8, caballoG8, null, null, null, null, null, null, null, null };
-            caballosNegros = INcaballosNegros;
-
-            Alfil alfilC1 = new Alfil('a', "C1", true);
-            Alfil alfilF1 = new Alfil('a', "F1", true);
-
-            Alfil[] IBalfilesBlancos = { alfilC1, alfilF1, null, null, null, null, null, null, null, null };
-            alfilesBlancos = IBalfilesBlancos;
-
-            Alfil alfilC8 = new Alfil('a', "C8", false);
-            Alfil alfilF8 = new Alfil('a', "F8", false);
-
-            Alfil[] INalfilesNegros = { alfilC8, alfilF8, null, null, null, null, null, null, null, null };
-            alfilesNegros = INalfilesNegros;
-
-            Rey ReyBlanco = new Rey('r', "E1", true);
-            Rey[] IBReyBlanco = { ReyBlanco };
-            reyBlanco = IBReyBlanco;
-            Rey ReyNegro = new Rey('r', "E8", false);
-            Rey[] INReyNegro = { ReyNegro };
-            reyNegro = INReyNegro;
-
-            Dama DamaBlanca = new Dama('d', "D1", true);
-            Dama[] IBDamaBlanca = { DamaBlanca, null, null, null, null, null, null, null, null };
-            damaBlanca = IBDamaBlanca;
-            Dama DamaNegra = new Dama('d', "D8", false);
-            Dama[] INDamaNegra = { DamaNegra, null, null, null, null, null, null, null, null };
-            damaNegra = INDamaNegra;
-
-
-            int fila = 0;
-            int filaBlamco = 0;
-            int filaNegro = 0;
-            for (int col = 0; col < peonesBlancos.Length; col++)
-            {
-                piezas[fila, col] = peonesBlancos[col];
-                piezasBlancas[filaBlamco, col] = peonesBlancos[col];
-            }
-            fila++;
-            filaBlamco++;
-            for (int col = 0; col < peonesNegros.Length; col++)
-            {
-                piezas[fila, col] = peonesNegros[col];
-                piezasNegras[filaNegro, col] = peonesNegros[col];
-            }
-            fila++;
-            filaNegro++;
-            for (int col = 0; col < torresBlancas.Length; col++)
-            {
-                piezas[fila, col] = torresBlancas[col];
-                piezasBlancas[filaBlamco, col] = torresBlancas[col];
-            }
-            fila++;
-            filaBlamco++;
-            for (int col = 0; col < torresNegras.Length; col++)
-            {
-                piezas[fila, col] = torresNegras[col];
-                piezasNegras[filaNegro, col] = torresNegras[col];
-            }
-            fila++;
-            filaNegro++;
-            for (int col = 0; col < caballosBlancos.Length; col++)
-            {
-                piezas[fila, col] = caballosBlancos[col];
-                piezasBlancas[filaBlamco, col] = caballosBlancos[col];
-            }
-            fila++;
-            filaBlamco++;
-            for (int col = 0; col < caballosNegros.Length; col++)
-            {
-                piezas[fila, col] = caballosNegros[col];
-                piezasNegras[filaNegro, col] = caballosNegros[col];
-            }
-            fila++;
-            filaNegro++;
-            for (int col = 0; col < alfilesBlancos.Length; col++)
-            {
-                piezas[fila, col] = alfilesBlancos[col];
-                piezasBlancas[filaBlamco, col] = alfilesBlancos[col];
-            }
-            fila++;
-            filaBlamco++;
-            for (int col = 0; col < alfilesNegros.Length; col++)
-            {
-                piezas[fila, col] = alfilesNegros[col];
-                piezasNegras[filaNegro, col] = alfilesNegros[col];
-            }
-            fila++;
-            filaNegro++;
-            piezas[fila++, 0] = reyBlanco[0];
-            piezasBlancas[filaBlamco++, 0] = reyBlanco[0];
-            piezas[fila++, 0] = reyNegro[0];
-            piezasNegras[filaNegro++, 0] = reyNegro[0];
-            piezas[fila++, 0] = damaBlanca[0];
-            piezasBlancas[filaBlamco++, 0] = damaBlanca[0];
-            piezas[fila++, 0] = damaNegra[0];
-            piezasNegras[filaNegro++, 0] = damaNegra[0];
+            string[] occupied = new string[16];
+            int i = 0;
+            foreach (Piece p in blackPieces)
+                if (p != null) occupied[i++] = p.Position;
+            return occupied;
         }
 
-        //Se llama a los movimientos de las piezas pasando argumentos distintos segun el contexto
-
-        //Peones
-        public static ArrayList moverPeon(string input)
+        public static void InitializeGame()
         {
-            ArrayList retorno = new ArrayList();
-            switch (turnoBlanco)
-            {
-                case true:
-                    retorno = PlantillaMovimientosPeon(input, peonesBlancos);
-                    break;
-                default:
-                    retorno = PlantillaMovimientosPeon(input, peonesNegros);
-                    break;
-            }
+            whitePawns = new Pawn[] { new('p',"A2",true), new('p',"B2",true), new('p',"C2",true), new('p',"D2",true), new('p',"E2",true), new('p',"F2",true), new('p',"G2",true), new('p',"H2",true), null, null };
+            blackPawns  = new Pawn[] { new('p',"A7",false), new('p',"B7",false), new('p',"C7",false), new('p',"D7",false), new('p',"E7",false), new('p',"F7",false), new('p',"G7",false), new('p',"H7",false), null, null };
+            whiteRooks   = new Rook[]   { new('r',"A1",true),  new('r',"H1",true),  null,null,null,null,null,null,null,null };
+            blackRooks   = new Rook[]   { new('r',"A8",false), new('r',"H8",false), null,null,null,null,null,null,null,null };
+            whiteKnights = new Knight[] { new('n',"B1",true),  new('n',"G1",true),  null,null,null,null,null,null,null,null };
+            blackKnights = new Knight[] { new('n',"B8",false), new('n',"G8",false), null,null,null,null,null,null,null,null };
+            whiteBishops = new Bishop[] { new('b',"C1",true),  new('b',"F1",true),  null,null,null,null,null,null,null,null };
+            blackBishops = new Bishop[] { new('b',"C8",false), new('b',"F8",false), null,null,null,null,null,null,null,null };
+            whiteKing    = new King[]   { new('k',"E1",true)  };
+            blackKing    = new King[]   { new('k',"E8",false) };
+            whiteQueen   = new Queen[]  { new('q',"D1",true),  null,null,null,null,null,null,null,null };
+            blackQueen   = new Queen[]  { new('q',"D8",false), null,null,null,null,null,null,null,null };
 
-            return retorno;
-        }
-        //Comer con peones
-        public static ArrayList ComerPeon(string input, string ingreso)
-        {
-            ArrayList retorno = new ArrayList();
-
-            switch (turnoBlanco)
-            {
-                case true:
-                    retorno = plantillaComer(input, peonesBlancos, ingreso);
-                    break;
-                default:
-                    retorno = plantillaComer(input, peonesNegros, ingreso);
-                    break;
-            }
-
-            return retorno;
-        }
-
-        //Resto de piezas
-
-        public static ArrayList moverPieza(string input, Piezas pieza)
-        {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
-            {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? PlantillaMovimientos(input, torresBlancas) : PlantillaMovimientos(input, torresNegras);
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? PlantillaMovimientos(input, caballosBlancos) : PlantillaMovimientos(input, caballosNegros);
-                    break;
-                case Piezas.alfil:
-                    retorno = turnoBlanco ? PlantillaMovimientos(input, alfilesBlancos) : PlantillaMovimientos(input, alfilesNegros);
-                    break;
-                case Piezas.dama:
-                    retorno = turnoBlanco ? PlantillaMovimientos(input, damaBlanca) : PlantillaMovimientos(input, damaNegra);
-                    break;
-                default:
-                    retorno = turnoBlanco ? PlantillaMovimientos(input, reyBlanco) : PlantillaMovimientos(input, reyNegro);
-                    break;
-            }
-            return retorno;
+            int row = 0, wRow = 0, bRow = 0;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = whitePawns[col]; whitePieces[wRow, col] = whitePawns[col]; }
+            row++; wRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = blackPawns[col]; blackPieces[bRow, col] = blackPawns[col]; }
+            row++; bRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = whiteRooks[col]; whitePieces[wRow, col] = whiteRooks[col]; }
+            row++; wRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = blackRooks[col]; blackPieces[bRow, col] = blackRooks[col]; }
+            row++; bRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = whiteKnights[col]; whitePieces[wRow, col] = whiteKnights[col]; }
+            row++; wRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = blackKnights[col]; blackPieces[bRow, col] = blackKnights[col]; }
+            row++; bRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = whiteBishops[col]; whitePieces[wRow, col] = whiteBishops[col]; }
+            row++; wRow++;
+            for (int col = 0; col < 10; col++) { allPieces[row, col] = blackBishops[col]; blackPieces[bRow, col] = blackBishops[col]; }
+            row++; bRow++;
+            allPieces[row++, 0] = whiteKing[0]; whitePieces[wRow++, 0] = whiteKing[0];
+            allPieces[row++, 0] = blackKing[0]; blackPieces[bRow++, 0] = blackKing[0];
+            allPieces[row++, 0] = whiteQueen[0]; whitePieces[wRow++, 0] = whiteQueen[0];
+            allPieces[row++, 0] = blackQueen[0]; blackPieces[bRow++, 0] = blackQueen[0];
         }
 
-        public static ArrayList moverPiezaEspecificoLetra(string input, Piezas pieza, List<string> listaSitiosEspecificos, string entrada)
+        public static ArrayList TryMovePawn(string input)
+            => isWhiteTurn ? PawnMoveTemplate(input, whitePawns) : PawnMoveTemplate(input, blackPawns);
+
+        public static ArrayList TryCapturePawn(string input, string rawInput)
+            => isWhiteTurn ? CaptureTemplate(input, whitePawns, rawInput) : CaptureTemplate(input, blackPawns, rawInput);
+
+        public static ArrayList TryMovePiece(string input, PieceType pieceType)
         {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
+            return pieceType switch
             {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoLetra(input, torresBlancas, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoLetra(input, torresNegras, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoLetra(input, caballosBlancos, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoLetra(input, caballosNegros, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.dama:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoLetra(input, damaBlanca, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoLetra(input, damaNegra, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.alfil:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoLetra(input, alfilesBlancos, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoLetra(input, alfilesNegros, listaSitiosEspecificos, entrada);
-                    break;
-            }
-            return retorno;
+                PieceType.Rook   => isWhiteTurn ? PieceMoveTemplate(input, whiteRooks)   : PieceMoveTemplate(input, blackRooks),
+                PieceType.Knight => isWhiteTurn ? PieceMoveTemplate(input, whiteKnights) : PieceMoveTemplate(input, blackKnights),
+                PieceType.Bishop => isWhiteTurn ? PieceMoveTemplate(input, whiteBishops) : PieceMoveTemplate(input, blackBishops),
+                PieceType.Queen  => isWhiteTurn ? PieceMoveTemplate(input, whiteQueen)   : PieceMoveTemplate(input, blackQueen),
+                _                => isWhiteTurn ? PieceMoveTemplate(input, whiteKing)    : PieceMoveTemplate(input, blackKing),
+            };
         }
 
-        public static ArrayList moverPiezaEspecificoNumero(string input, Piezas pieza, List<string> listaSitiosEspecificos, string entrada)
+        public static ArrayList TryMovePieceSpecificFile(string input, PieceType pieceType, List<string> ambiguous, string rawInput)
         {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
+            return pieceType switch
             {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoNumero(input, torresBlancas, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoNumero(input, torresNegras, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoNumero(input, caballosBlancos, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoNumero(input, caballosNegros, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.dama:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoNumero(input, damaBlanca, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoNumero(input, damaNegra, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.alfil:
-                    retorno = turnoBlanco ? PlantillaMovimientosEspecificoNumero(input, alfilesBlancos, listaSitiosEspecificos, entrada) : PlantillaMovimientosEspecificoNumero(input, alfilesNegros, listaSitiosEspecificos, entrada);
-                    break;
-            }
-            return retorno;
+                PieceType.Rook   => isWhiteTurn ? PieceMoveSpecificFileTemplate(input, whiteRooks,   ambiguous, rawInput) : PieceMoveSpecificFileTemplate(input, blackRooks,   ambiguous, rawInput),
+                PieceType.Knight => isWhiteTurn ? PieceMoveSpecificFileTemplate(input, whiteKnights, ambiguous, rawInput) : PieceMoveSpecificFileTemplate(input, blackKnights, ambiguous, rawInput),
+                PieceType.Queen  => isWhiteTurn ? PieceMoveSpecificFileTemplate(input, whiteQueen,   ambiguous, rawInput) : PieceMoveSpecificFileTemplate(input, blackQueen,   ambiguous, rawInput),
+                _                => isWhiteTurn ? PieceMoveSpecificFileTemplate(input, whiteBishops, ambiguous, rawInput) : PieceMoveSpecificFileTemplate(input, blackBishops, ambiguous, rawInput),
+            };
         }
 
-        //Se llama a los movimientos que comen de las piezas pasando argumentos distintos segun el contexto
-        public static ArrayList comerPieza(string input, Piezas pieza)
+        public static ArrayList TryMovePieceSpecificRank(string input, PieceType pieceType, List<string> ambiguous, string rawInput)
         {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
+            return pieceType switch
             {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? plantillaComer(input, torresBlancas, "") : plantillaComer(input, torresNegras, "");
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? plantillaComer(input, caballosBlancos, "") : plantillaComer(input, caballosNegros, "");
-                    break;
-                case Piezas.alfil:
-                    retorno = turnoBlanco ? plantillaComer(input, alfilesBlancos, "") : plantillaComer(input, alfilesNegros, "");
-                    break;
-                case Piezas.dama:
-                    retorno = turnoBlanco ? plantillaComer(input, damaBlanca, "") : plantillaComer(input, damaNegra, "");
-                    break;
-                default:
-                    retorno = turnoBlanco ? plantillaComer(input, reyBlanco, "") : plantillaComer(input, reyNegro, "");
-                    break;
-            }
-
-            return retorno;
+                PieceType.Rook   => isWhiteTurn ? PieceMoveSpecificRankTemplate(input, whiteRooks,   ambiguous, rawInput) : PieceMoveSpecificRankTemplate(input, blackRooks,   ambiguous, rawInput),
+                PieceType.Knight => isWhiteTurn ? PieceMoveSpecificRankTemplate(input, whiteKnights, ambiguous, rawInput) : PieceMoveSpecificRankTemplate(input, blackKnights, ambiguous, rawInput),
+                PieceType.Queen  => isWhiteTurn ? PieceMoveSpecificRankTemplate(input, whiteQueen,   ambiguous, rawInput) : PieceMoveSpecificRankTemplate(input, blackQueen,   ambiguous, rawInput),
+                _                => isWhiteTurn ? PieceMoveSpecificRankTemplate(input, whiteBishops, ambiguous, rawInput) : PieceMoveSpecificRankTemplate(input, blackBishops, ambiguous, rawInput),
+            };
         }
 
-        public static ArrayList comerPiezaEspecificoLetra(string input, Piezas pieza, List<string> listaSitiosEspecificos, string entrada)
+        public static ArrayList TryCapturePiece(string input, PieceType pieceType)
         {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
+            return pieceType switch
             {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? plantillaComerEspecificoLetra(input, torresBlancas, listaSitiosEspecificos, entrada) : plantillaComerEspecificoLetra(input, torresNegras, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? plantillaComerEspecificoLetra(input, caballosBlancos, listaSitiosEspecificos, entrada) : plantillaComerEspecificoLetra(input, caballosNegros, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.dama:
-                    retorno = turnoBlanco ? plantillaComerEspecificoLetra(input, damaBlanca, listaSitiosEspecificos, entrada) : plantillaComerEspecificoLetra(input, damaNegra, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.alfil:
-                    retorno = turnoBlanco ? plantillaComerEspecificoLetra(input, alfilesBlancos, listaSitiosEspecificos, entrada) : plantillaComerEspecificoLetra(input, alfilesNegros, listaSitiosEspecificos, entrada);
-                    break;
-            }
-
-            return retorno;
+                PieceType.Rook   => isWhiteTurn ? CaptureTemplate(input, whiteRooks,   "") : CaptureTemplate(input, blackRooks,   ""),
+                PieceType.Knight => isWhiteTurn ? CaptureTemplate(input, whiteKnights, "") : CaptureTemplate(input, blackKnights, ""),
+                PieceType.Bishop => isWhiteTurn ? CaptureTemplate(input, whiteBishops, "") : CaptureTemplate(input, blackBishops, ""),
+                PieceType.Queen  => isWhiteTurn ? CaptureTemplate(input, whiteQueen,   "") : CaptureTemplate(input, blackQueen,   ""),
+                _                => isWhiteTurn ? CaptureTemplate(input, whiteKing,    "") : CaptureTemplate(input, blackKing,    ""),
+            };
         }
 
-        public static ArrayList comerPiezaEspecificoNumero(string input, Piezas pieza, List<string> listaSitiosEspecificos, string entrada)
+        public static ArrayList TryCaptureSpecificFile(string input, PieceType pieceType, List<string> ambiguous, string rawInput)
         {
-            ArrayList retorno = new ArrayList();
-            switch (pieza)
+            return pieceType switch
             {
-                case Piezas.torre:
-                    retorno = turnoBlanco ? plantillaComerEspecificoNumero(input, torresBlancas, listaSitiosEspecificos, entrada) : plantillaComerEspecificoNumero(input, torresNegras, listaSitiosEspecificos, entrada);
-                    break;
-                case Piezas.caballo:
-                    retorno = turnoBlanco ? plantillaComerEspecificoNumero(input, caballosBlancos, listaSitiosEspecificos, entrada) : plantillaComerEspecificoNumero(input, caballosNegros, listaSitiosEspecificos, entrada);
-                    break;
-            }
-
-            return retorno;
+                PieceType.Rook   => isWhiteTurn ? CaptureSpecificFileTemplate(input, whiteRooks,   ambiguous, rawInput) : CaptureSpecificFileTemplate(input, blackRooks,   ambiguous, rawInput),
+                PieceType.Knight => isWhiteTurn ? CaptureSpecificFileTemplate(input, whiteKnights, ambiguous, rawInput) : CaptureSpecificFileTemplate(input, blackKnights, ambiguous, rawInput),
+                PieceType.Queen  => isWhiteTurn ? CaptureSpecificFileTemplate(input, whiteQueen,   ambiguous, rawInput) : CaptureSpecificFileTemplate(input, blackQueen,   ambiguous, rawInput),
+                _                => isWhiteTurn ? CaptureSpecificFileTemplate(input, whiteBishops, ambiguous, rawInput) : CaptureSpecificFileTemplate(input, blackBishops, ambiguous, rawInput),
+            };
         }
 
-        //Enroque
-        public static bool enroque(string input, Rey[] ReyAnalizar)
+        public static ArrayList TryCaptureSpecificRank(string input, PieceType pieceType, List<string> ambiguous, string rawInput)
         {
-            bool retorno = false;
-
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
-
-            List<string> lugaresAtacadosColorContrario = ReyAnalizar[0].Blanca ? LugaresAtacadosNegros(todo, negras, blancas) : LugaresAtacadosBlancos(todo, negras, blancas);
-
-            List<string> conjunto = new List<string>();
-            conjunto.AddRange(todo); conjunto.AddRange(blancas); conjunto.AddRange(negras); conjunto.AddRange(lugaresAtacadosColorContrario);
-
-
-            Func<string, string, string, Torre, bool> condicion = delegate (string thisInput, string posicion1, string posicion2, Torre torresAnalizar)
+            return pieceType switch
             {
-                bool posible = true;
-                if (input == thisInput && torresAnalizar.permiteEnroque)
-                {
-                    foreach (string posicion in conjunto)
-                    {
-                        if (posicion == posicion1 || posicion == posicion2)
-                        {
-                            posible = false;
-                            break;
-                        }
-                    }
-                }
-                if (posible)
-                {
-                    torresAnalizar.Posicion = posicion1;
-                    ReyAnalizar[0].Posicion = posicion2;
-                }
+                PieceType.Rook   => isWhiteTurn ? CaptureSpecificRankTemplate(input, whiteRooks,   ambiguous, rawInput) : CaptureSpecificRankTemplate(input, blackRooks,   ambiguous, rawInput),
+                PieceType.Knight => isWhiteTurn ? CaptureSpecificRankTemplate(input, whiteKnights, ambiguous, rawInput) : CaptureSpecificRankTemplate(input, blackKnights, ambiguous, rawInput),
+                _                => new ArrayList(),
+            };
+        }
 
-                return posible;
+        public static bool TryCastle(string input, King[] king)
+        {
+            string[] occupied = AllOccupiedSquares();
+            string[] white = WhiteOccupiedSquares();
+            string[] black = BlackOccupiedSquares();
+
+            List<string> enemyAttacked = king[0].IsWhite
+                ? BlackAttackedSquares(occupied, black, white)
+                : WhiteAttackedSquares(occupied, black, white);
+
+            List<string> combined = new List<string>();
+            combined.AddRange(occupied); combined.AddRange(white); combined.AddRange(black); combined.AddRange(enemyAttacked);
+
+            Func<string, string, string, Rook, bool> check = (cmd, sq1, sq2, rook) =>
+            {
+                if (input != cmd || !rook.CanCastle) return false;
+                foreach (string sq in combined)
+                    if (sq == sq1 || sq == sq2) return false;
+                rook.Position = sq1;
+                king[0].Position = sq2;
+                return true;
             };
 
-            if (ReyAnalizar[0].Blanca && ReyAnalizar[0].permiteEnroque)
+            if (king[0].IsWhite && king[0].CanCastle)
             {
-                if (input == "0-0")
-                {
-                    retorno = condicion("0-0", "F1", "G1", torresBlancas[1]);
-                    if (retorno)
-                    {
-                        torresBlancas[1].permiteEnroque = false;
-                        reyBlanco[0].permiteEnroque = false;
-                    }
-                }
-
-                if (input == "0-0-0")
-                {
-                    retorno = condicion("0-0-0", "D1", "C1", torresBlancas[0]);
-                    if (retorno)
-                    {
-                        torresBlancas[0].permiteEnroque = false;
-                        reyBlanco[0].permiteEnroque = false;
-                    }
-                }
+                if (input == "0-0"   && check("0-0",   "F1", "G1", whiteRooks[1])) { whiteRooks[1].CanCastle = false; whiteKing[0].CanCastle = false; return true; }
+                if (input == "0-0-0" && check("0-0-0", "D1", "C1", whiteRooks[0])) { whiteRooks[0].CanCastle = false; whiteKing[0].CanCastle = false; return true; }
             }
-            else if (!ReyAnalizar[0].Blanca && ReyAnalizar[0].permiteEnroque)
+            else if (!king[0].IsWhite && king[0].CanCastle)
             {
-                if (input == "0-0")
-                {
-                    retorno = condicion("0-0", "F8", "G8", torresNegras[1]);
-                    if (retorno)
-                    {
-                        torresNegras[1].permiteEnroque = false;
-                        reyNegro[0].permiteEnroque = false;
-                    }
-                }
-
-                if (input == "0-0-0")
-                {
-                    retorno = condicion("0-0-0", "D8", "C8", torresNegras[0]);
-                    if (retorno)
-                    {
-                        torresNegras[0].permiteEnroque = false;
-                        reyNegro[0].permiteEnroque = false;
-                    }
-                }
+                if (input == "0-0"   && check("0-0",   "F8", "G8", blackRooks[1])) { blackRooks[1].CanCastle = false; blackKing[0].CanCastle = false; return true; }
+                if (input == "0-0-0" && check("0-0-0", "D8", "C8", blackRooks[0])) { blackRooks[0].CanCastle = false; blackKing[0].CanCastle = false; return true; }
             }
 
-            return retorno;
+            return false;
         }
 
-        // Lugares ocupados para peones
-        public static string[] LugaresOcupadosBlancasParaPeon()
+        public static string[] WhiteOccupiedSquaresForPawn()
         {
-            string[] posicionesOcupadas = new string[17];
-            int indice = 0;
-
-            foreach (Pieza p in piezasBlancas)
-            {
-                if (p != null)
-                {
-                    posicionesOcupadas[indice] = p.Posicion;
-                    indice++;
-                }
-            }
-
-            foreach (Peon peon in peonesBlancos)
-            {
-                if (peon != null && peon.comerAlPaso != null && peon.comerAlPaso != "")
-                {
-                    posicionesOcupadas[16] = peon.comerAlPaso;
-                    break;
-                }
-            }
-            return posicionesOcupadas;
+            string[] occupied = new string[17];
+            int i = 0;
+            foreach (Piece p in whitePieces)
+                if (p != null) occupied[i++] = p.Position;
+            foreach (Pawn pawn in whitePawns)
+                if (pawn != null && pawn.EnPassantSquare != null && pawn.EnPassantSquare != "")
+                { occupied[16] = pawn.EnPassantSquare; break; }
+            return occupied;
         }
 
-        public static string[] LugaresOcupadosNegrasParaPeon()
+        public static string[] BlackOccupiedSquaresForPawn()
         {
-            string[] posicionesOcupadas = new string[17];
-            int indice = 0;
-
-            foreach (Pieza p in piezasNegras)
-            {
-                if (p != null)
-                {
-                    posicionesOcupadas[indice] = p.Posicion;
-                    indice++;
-                }
-            }
-
-            foreach (Peon peon in peonesNegros)
-            {
-                if (peon != null && peon.comerAlPaso != null && peon.comerAlPaso != "")
-                {
-                    posicionesOcupadas[16] = peon.comerAlPaso;
-                    break;
-                }
-            }
-            return posicionesOcupadas;
+            string[] occupied = new string[17];
+            int i = 0;
+            foreach (Piece p in blackPieces)
+                if (p != null) occupied[i++] = p.Position;
+            foreach (Pawn pawn in blackPawns)
+                if (pawn != null && pawn.EnPassantSquare != null && pawn.EnPassantSquare != "")
+                { occupied[16] = pawn.EnPassantSquare; break; }
+            return occupied;
         }
 
-
-        public static ArrayList PlantillaMovimientosPeon(string input, Peon[] piezasAnalizar)
+        public static ArrayList PawnMoveTemplate(string input, Pawn[] pawns)
         {
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
+            string[] occupied = AllOccupiedSquares();
+            string[] black = BlackOccupiedSquares();
+            string[] white = WhiteOccupiedSquares();
 
-            ArrayList retorno = new ArrayList();
-
-            List<string> posicionesValidas = null;
-
-            foreach (Peon pieza in piezasAnalizar)
+            foreach (Pawn pawn in pawns)
             {
-                if (pieza != null) posicionesValidas = pieza.PosicionesValidas(todo, negras, blancas, null);
+                if (pawn == null) continue;
+                List<string> valid = pawn.ValidSquares(occupied, black, white, null);
 
-                foreach (string posicion in posicionesValidas)
+                foreach (string sq in valid)
                 {
-                    if (posicion == input)
+                    if (sq == input)
                     {
-                        retorno.Add(pieza);
-                        retorno.Add(input);
-
-                        if (posicionesValidas[1] != null && turnoBlanco && posicionesValidas[1] == posicion) pieza.comerAlPaso = posicion[0] + "3";
-                        else if (posicionesValidas[1] != null && !turnoBlanco && posicionesValidas[1] == posicion) pieza.comerAlPaso = posicion[0] + "6";
-                        return retorno;
-                    }
-                }
-            }
-            retorno = null;
-            return retorno;
-        }
-
-        //Plantilla de movimientos
-        public static ArrayList PlantillaMovimientos<T>(string input, T[] piezasAnalizar) where T : Pieza
-        {
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
-
-            ArrayList retorno = new ArrayList();
-
-            List<string> posicionesValidas = null;
-
-            string tipoDato = piezasAnalizar.GetType().ToString();
-
-            List<string> lugaresAtacadosColorContrario = null;
-            if (tipoDato == "Ajedrez.Rey[]")
-            {
-                lugaresAtacadosColorContrario = piezasAnalizar[0].Blanca ? LugaresAtacadosNegros(todo, negras, blancas) : LugaresAtacadosBlancos(todo, negras, blancas);
-            }
-
-            foreach (T pieza in piezasAnalizar)
-            {
-                if (pieza != null) posicionesValidas = pieza.PosicionesValidas(todo, negras, blancas, lugaresAtacadosColorContrario);
-
-                if (posicionesValidas != null)
-                {
-                    foreach (string posicion in posicionesValidas)
-                    {
-                        if (posicion == input)
-                        {
-                            retorno.Add(pieza);
-                            retorno.Add(input);
-                            return retorno;
-                        }
-                    }
-                }
-            }
-            retorno = null;
-            return retorno;
-        }
-
-        public static ArrayList PlantillaMovimientosEspecificoLetra<T>(string input, T[] piezasAnalizar, List<string> listaSitiosEspecificos, string entrada) where T : Pieza
-        {
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
-
-            ArrayList retorno = new ArrayList();
-
-            foreach (T pieza in piezasAnalizar)
-            {
-                foreach (string posicion in listaSitiosEspecificos)
-                {
-                    if (posicion == input && entrada[1].ToString().ToUpper() == pieza.Posicion[0].ToString().ToUpper())
-                    {
-                        retorno.Add(pieza);
-                        retorno.Add(input);
-                        return retorno;
-                    }
-                }
-            }
-            retorno = null;
-            return retorno;
-        }
-
-        public static ArrayList PlantillaMovimientosEspecificoNumero<T>(string input, T[] piezasAnalizar, List<string> listaSitiosEspecificos, string entrada) where T : Pieza
-        {
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
-
-            ArrayList retorno = new ArrayList();
-
-            foreach (T pieza in piezasAnalizar)
-            {
-                foreach (string posicion in listaSitiosEspecificos)
-                {
-                    if (posicion == input && entrada[1].ToString() == pieza.Posicion[1].ToString())
-                    {
-                        retorno.Add(pieza);
-                        retorno.Add(input);
-                        return retorno;
-                    }
-                }
-            }
-            retorno = null;
-            return retorno;
-        }
-
-        //Plantilla de comer
-        public static ArrayList plantillaComer<T>(string input, T[] piezasAnalizar, string ingreso) where T : Pieza
-        {
-            ArrayList retorno = new ArrayList();
-
-            List<string> posicionesValidas = null;
-            string[] todo = LugaresOcupados();
-
-            string tipo = piezasAnalizar.GetType().ToString();
-
-            if (tipo == "Ajedrez.Peon[]")
-            {
-                string[] blancas = LugaresOcupadosBlancasParaPeon();
-                string[] negras = LugaresOcupadosNegrasParaPeon();
-                foreach (T pieza in piezasAnalizar)
-                {
-                    if (pieza != null && ingreso[0].ToString().ToUpper() == pieza.Posicion[0].ToString())
-                    {
-                        if (pieza != null) posicionesValidas = pieza.comer(todo, negras, blancas, null);
-
-                        if (posicionesValidas != null)
-                        {
-                            foreach (string posicion in posicionesValidas)
-                            {
-                                if (posicion == input)
-                                {
-                                    retorno.Add(pieza);
-                                    retorno.Add(input);
-
-                                    if (negras[16] == input || blancas[16] == input)
-                                    {
-                                        ComerAlPasoeliminarAlComerAlPaso(input);
-                                    }
-                                    return retorno;
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                string[] blancas = LugaresOcupadosBlancas();
-                string[] negras = LugaresOcupadosNegras();
-
-                List<string> lugaresAtacadosColorContrario = null;
-
-                if (tipo == "Ajedrez.Rey[]")
-                {
-                    lugaresAtacadosColorContrario = piezasAnalizar[0].Blanca ? LugaresAtacadosNegros(todo, negras, blancas) : LugaresAtacadosBlancos(todo, negras, blancas);
-                }
-
-
-                foreach (T pieza in piezasAnalizar)
-                {
-                    if (pieza != null) posicionesValidas = pieza.comer(todo, negras, blancas, lugaresAtacadosColorContrario);
-
-                    if (posicionesValidas != null)
-                    {
-                        foreach (string posicion in posicionesValidas)
-                        {
-                            if (posicion == input)
-                            {
-                                retorno.Add(pieza);
-                                retorno.Add(input);
-                                return retorno;
-                            }
-                        }
+                        if (valid[1] != null && isWhiteTurn && valid[1] == sq) pawn.EnPassantSquare = sq[0] + "3";
+                        else if (valid[1] != null && !isWhiteTurn && valid[1] == sq) pawn.EnPassantSquare = sq[0] + "6";
+                        return new ArrayList { pawn, input };
                     }
                 }
             }
             return null;
         }
 
-        public static ArrayList plantillaComerEspecificoLetra<T>(string input, T[] piezasAnalizar, List<string> listaSitiosEspecificos, string entrada) where T : Pieza
+        public static ArrayList PieceMoveTemplate<T>(string input, T[] pieces) where T : Piece
         {
-            ArrayList retorno = new ArrayList();
+            string[] occupied = AllOccupiedSquares();
+            string[] black = BlackOccupiedSquares();
+            string[] white = WhiteOccupiedSquares();
 
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
+            List<string> enemyAttacked = null;
+            if (pieces.GetType().ToString() == "Chess.King[]")
+                enemyAttacked = pieces[0].IsWhite
+                    ? BlackAttackedSquares(occupied, black, white)
+                    : WhiteAttackedSquares(occupied, black, white);
 
-
-            foreach (T pieza in piezasAnalizar)
+            foreach (T piece in pieces)
             {
-                foreach (string posicion in listaSitiosEspecificos)
-                {
-                    if (posicion == input && pieza.Posicion[0].ToString() == entrada[1].ToString().ToUpper())
-                    {
-                        retorno.Add(pieza);
-                        retorno.Add(input);
-                        return retorno;
-                    }
-                }
+                if (piece == null) continue;
+                List<string> valid = piece.ValidSquares(occupied, black, white, enemyAttacked);
+                if (valid == null) continue;
+                foreach (string sq in valid)
+                    if (sq == input) return new ArrayList { piece, input };
             }
-
-            return null;
-        }
-        public static ArrayList plantillaComerEspecificoNumero<T>(string input, T[] piezasAnalizar, List<string> listaSitiosEspecificos, string entrada) where T : Pieza
-        {
-            ArrayList retorno = new ArrayList();
-
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
-
-
-            foreach (T pieza in piezasAnalizar)
-            {
-                foreach (string posicion in listaSitiosEspecificos)
-                {
-                    if (posicion == input && pieza.Posicion[1].ToString() == entrada[1].ToString().ToUpper())
-                    {
-                        retorno.Add(pieza);
-                        retorno.Add(input);
-                        return retorno;
-                    }
-                }
-
-            }
-
             return null;
         }
 
-        //Por si hay dos piezas que usan la misma nomenclatura para mover en una partida
-        public static List<string> nomenclaturaIgual<T>(T[] piezas) where T : Pieza
+        public static ArrayList PieceMoveSpecificFileTemplate<T>(string input, T[] pieces, List<string> ambiguous, string rawInput) where T : Piece
         {
-            List<string> retorno = new List<string>();
+            foreach (T piece in pieces)
+                foreach (string sq in ambiguous)
+                    if (sq == input && rawInput[1].ToString().ToUpper() == piece.Position[0].ToString().ToUpper())
+                        return new ArrayList { piece, input };
+            return null;
+        }
 
-            string[] todo = LugaresOcupados();
-            string[] blancas = LugaresOcupadosBlancas();
-            string[] negras = LugaresOcupadosNegras();
+        public static ArrayList PieceMoveSpecificRankTemplate<T>(string input, T[] pieces, List<string> ambiguous, string rawInput) where T : Piece
+        {
+            foreach (T piece in pieces)
+                foreach (string sq in ambiguous)
+                    if (sq == input && rawInput[1].ToString() == piece.Position[1].ToString())
+                        return new ArrayList { piece, input };
+            return null;
+        }
 
-            List<string> movs1 = new List<string>();
-            List<string> movs2 = new List<string>();
+        public static ArrayList CaptureTemplate<T>(string input, T[] pieces, string rawInput) where T : Piece
+        {
+            string[] occupied = AllOccupiedSquares();
 
-            if (piezas[0] != null && piezas[1] != null)
+            if (pieces.GetType().ToString() == "Chess.Pawn[]")
             {
-                movs1.AddRange(piezas[0].PosicionesValidas(todo, negras, blancas, null));
-                movs1.AddRange(piezas[0].comer(todo, negras, blancas, null));
+                string[] white = WhiteOccupiedSquaresForPawn();
+                string[] black = BlackOccupiedSquaresForPawn();
 
-                movs2.AddRange(piezas[1].PosicionesValidas(todo, negras, blancas, null));
-                movs2.AddRange(piezas[1].comer(todo, negras, blancas, null));
-
-                movs1.RemoveAll(item => int.TryParse(item, out int result));
-                movs2.RemoveAll(item => int.TryParse(item, out int result));
-
-                movs1.ForEach(item =>
+                foreach (T piece in pieces)
                 {
-                    if (item != null && item != "")
+                    if (piece == null || rawInput[0].ToString().ToUpper() != piece.Position[0].ToString()) continue;
+                    List<string> valid = piece.Capture(occupied, black, white, null);
+                    if (valid == null) continue;
+                    foreach (string sq in valid)
                     {
-                        movs2.ForEach(item2 =>
+                        if (sq == input)
                         {
-                            if (item2 != null && item != "" && item == item2) retorno.Add(item);
-                        });
+                            if (black[16] == input || white[16] == input)
+                                RemoveEnPassantPawn(input);
+                            return new ArrayList { piece, input };
+                        }
                     }
-                });
-            }
-
-            if (retorno.Count == 0)
-            {
-                return null;
-            }
-
-            return retorno;
-        }
-
-        public static bool LetrasONumeros<T>(T[] piezas) where T : Pieza
-        {
-            if (piezas[0].Posicion[0] != piezas[1].Posicion[0]) return true;
-            else return false;
-        }
-
-        public static void reiniciarComerAlPaso()
-        {
-            if (turnoBlanco)
-            {
-                foreach (Peon peon in peonesBlancos)
-                {
-                    if (peon != null) peon.comerAlPaso = "";
                 }
             }
             else
             {
-                foreach (Peon peon in peonesNegros)
+                string[] white = WhiteOccupiedSquares();
+                string[] black = BlackOccupiedSquares();
+
+                List<string> enemyAttacked = null;
+                if (pieces.GetType().ToString() == "Chess.King[]")
+                    enemyAttacked = pieces[0].IsWhite
+                        ? BlackAttackedSquares(occupied, black, white)
+                        : WhiteAttackedSquares(occupied, black, white);
+
+                foreach (T piece in pieces)
                 {
-                    if (peon != null) peon.comerAlPaso = "";
+                    if (piece == null) continue;
+                    List<string> valid = piece.Capture(occupied, black, white, enemyAttacked);
+                    if (valid == null) continue;
+                    foreach (string sq in valid)
+                        if (sq == input) return new ArrayList { piece, input };
                 }
             }
+
+            return null;
         }
 
-        public static void ComerAlPasoeliminarAlComerAlPaso(string input)
+        public static ArrayList CaptureSpecificFileTemplate<T>(string input, T[] pieces, List<string> ambiguous, string rawInput) where T : Piece
         {
-            int counter = 0;
-            if (turnoBlanco)
+            foreach (T piece in pieces)
+                foreach (string sq in ambiguous)
+                    if (sq == input && piece.Position[0].ToString() == rawInput[1].ToString().ToUpper())
+                        return new ArrayList { piece, input };
+            return null;
+        }
+
+        public static ArrayList CaptureSpecificRankTemplate<T>(string input, T[] pieces, List<string> ambiguous, string rawInput) where T : Piece
+        {
+            foreach (T piece in pieces)
+                foreach (string sq in ambiguous)
+                    if (sq == input && piece.Position[1].ToString() == rawInput[1].ToString().ToUpper())
+                        return new ArrayList { piece, input };
+            return null;
+        }
+
+        public static List<string> FindAmbiguousMoves<T>(T[] pieces) where T : Piece
+        {
+            if (pieces[0] == null || pieces[1] == null) return null;
+
+            string[] occupied = AllOccupiedSquares();
+            string[] black = BlackOccupiedSquares();
+            string[] white = WhiteOccupiedSquares();
+
+            List<string> moves0 = new List<string>();
+            moves0.AddRange(pieces[0].ValidSquares(occupied, black, white, null));
+            moves0.AddRange(pieces[0].Capture(occupied, black, white, null));
+
+            List<string> moves1 = new List<string>();
+            moves1.AddRange(pieces[1].ValidSquares(occupied, black, white, null));
+            moves1.AddRange(pieces[1].Capture(occupied, black, white, null));
+
+            moves0.RemoveAll(item => int.TryParse(item, out _));
+            moves1.RemoveAll(item => int.TryParse(item, out _));
+
+            List<string> shared = new List<string>();
+            moves0.ForEach(m0 =>
             {
-                foreach (Peon peon in peonesNegros)
+                if (m0 != null && m0 != "")
+                    moves1.ForEach(m1 => { if (m1 != null && m0 == m1) shared.Add(m0); });
+            });
+
+            return shared.Count == 0 ? null : shared;
+        }
+
+        public static bool DifferentFiles<T>(T[] pieces) where T : Piece
+            => pieces[0].Position[0] != pieces[1].Position[0];
+
+        public static void ResetEnPassant()
+        {
+            Pawn[] pawns = isWhiteTurn ? whitePawns : blackPawns;
+            foreach (Pawn pawn in pawns)
+                if (pawn != null) pawn.EnPassantSquare = "";
+        }
+
+        public static void RemoveEnPassantPawn(string captureSquare)
+        {
+            int i = 0;
+            if (isWhiteTurn)
+            {
+                foreach (Pawn pawn in blackPawns)
                 {
-                    if (peon != null && peon.Posicion == input[0] + "5")
-                    {
-                        peonesNegros[counter] = null;
-                        piezas[1, counter] = null;
-                        break;
-                    }
-                    counter++;
+                    if (pawn != null && pawn.Position == captureSquare[0] + "5")
+                    { blackPawns[i] = null; allPieces[1, i] = null; break; }
+                    i++;
                 }
             }
             else
             {
-                foreach (Peon peon in peonesBlancos)
+                foreach (Pawn pawn in whitePawns)
                 {
-                    if (peon != null && peon.Posicion == input[0] + "4")
-                    {
-                        peonesNegros[counter] = null;
-                        piezas[0, counter] = null;
-                        break;
-                    }
-                    counter++;
+                    if (pawn != null && pawn.Position == captureSquare[0] + "4")
+                    { blackPawns[i] = null; allPieces[0, i] = null; break; }
+                    i++;
                 }
             }
         }
